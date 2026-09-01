@@ -478,6 +478,10 @@ a:hover { color: var(--c-accent-hover); }
   text-align: center;
   padding: var(--sp-7) var(--sp-5);
   max-width: 30rem;
+  /* Yukari yasla: .gate flex-center, altta piksel sahnesi var. Ortada
+     kalirsa metin karakterlerin uzerine biner. */
+  align-self: start;
+  padding-top: clamp(1.5rem, 5vh, 4rem);
 }
 
 .gate__kicker {
@@ -523,24 +527,76 @@ a:hover { color: var(--c-accent-hover); }
    Sahnenin kendi stili 19. bölümde ve `.dugun-davetiye` altında kapsüllü.
    Burada SADECE kapı içindeki yerleşimi ve aşama geçişi var.             */
 
+/* Sahne 1. AŞAMADA DA GÖRÜNÜR: açılış ekranı yıldızlı alacakaranlık gökyüzü
+   ve ayrık duran gelin/damat. Metin bunun üstüne biniyor (z-index 2).
+   Tıklanınca metin solar, karakterler birbirine yürür.
+   z-index 1: .gate__media (0) üstünde, .gate__content (2) altında. */
 .gate__scene {
   position: absolute;
   inset: 0;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  visibility: hidden;
+  z-index: 1;
   pointer-events: none;
-  /* visibility gecikmeli kapanır: fade-out bitmeden gizlenmesin */
-  transition: opacity var(--dur-slow) var(--ease-out),
-              visibility 0s linear var(--dur-slow);
 }
 
-.gate.is-playing .gate__scene {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
+/* Metin okunabilirlik perdesi. Sahnenin alt yarısı açık şeftali rengi,
+   beyaz yazı orada kaybolur. Animasyon başlayınca perde de kalkıyor. */
+.gate__scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(20, 16, 32, 0.72) 0%,
+    rgba(20, 16, 32, 0.58) 38%,
+    rgba(20, 16, 32, 0.18) 62%,
+    rgba(20, 16, 32, 0) 78%);
+  transition: opacity var(--dur-slow) var(--ease);
+}
+.gate.is-playing .gate__scene::after { opacity: 0; }
+
+/* Sahnenin alt yazısı (isim + tarih) 1. aşamada gizli: kapı metni zaten
+   aynı ismi ve tarihi üstte gösteriyor, ikisi birden görünürse tekrar olur.
+   Normal modda animasyon 0. karede beklediği için zaten opacity 0; bu kural
+   hareket-azaltma modu için gerekli — orada animasyonlar anında bitiyor. */
+.gate:not(.is-playing) .dugun-davetiye .yazi { opacity: 0; }
+
+/* Kapı içinde sahne tam ekran: ortalanmış 5/6 panel değil.
+   Gökyüzü bir gradyan, zemin ve yıldızlar yüzdeyle konumlandığı için
+   serbest en/boy oranında bozulmadan çalışıyor. Karakterler `--unit` ile
+   ölçekli, panel boyutundan bağımsız. */
+.gate__scene .dugun-davetiye {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  max-height: none;
+  margin-inline: 0;
+  /* Zemin aşağı: metin üstte gökyüzünde, çift altta zeminde durur.
+     5/6 panelde 24% doğruydu, tam ekranda çift ekranın ortasına düşüyordu. */
+  --zemin: 13%;
+  --yazi-alt: 3%;
+}
+
+/* Kapıda dikey bütçe: üst metin bloğu (~420px) + karakter boyu + alt yazı
+   (~90px). --unit 3px'te karakter 309px, toplam ~819px eder; bundan kısa
+   viewport'ta buton karakterlerin başına biniyordu.
+   Değerler TAM SAYI px kalıyor (piksel hizası, bkz. bölüm başlığı). */
+@media (max-height: 58rem) {
+  .gate__scene .dugun-davetiye { --unit: 2px; }   /* karakter 206px */
+}
+@media (max-height: 40rem) {
+  /* Yatay çevrilmiş telefon: metnin kendisi de küçülmeli */
+  .gate__names { font-size: var(--fs-2xl); }
+  .gate__date { margin-bottom: var(--sp-5); }
+  .gate__kicker { margin-bottom: var(--sp-3); }
+}
+
+/* Çok kısa viewport (yatay telefon): 390px yüksekliğe ~324px metin bloğu +
+   206px karakter sığmıyor, --unit 1px'e inse bile sığmaz. Sahneyi tamamen
+   kaldırıp klasik kapıya (fotoğraf + metin) dönüyoruz.
+   app.js sahnenin görünür olup olmadığını kontrol ediyor; görünmüyorsa
+   animasyon aşamasını atlayıp kapıyı doğrudan kapatıyor. */
+@media (max-height: 32rem) {
+  .gate__scene { display: none; }
+  .gate.is-playing .gate__media { opacity: 1; }
 }
 
 /* Karşılama aşaması solar ama DOM'DA KALIR — #gate-names, .gate'in
@@ -552,11 +608,12 @@ a:hover { color: var(--c-accent-hover); }
 }
 
 /* Animasyonu atla. Sahne başlayınca JS is-hidden'ı kaldırır. */
+/* Sağ ÜST köşe: altta sahnenin isim/tarih yazısı var, mobilde çakışıyordu. */
 .gate__skip {
   position: absolute;
   z-index: 4;
   right: var(--sp-5);
-  bottom: var(--sp-5);
+  top: var(--sp-5);
   padding: 0.5rem 1rem;
   border: 1px solid var(--c-text-invert-soft);
   border-radius: var(--radius-pill);
@@ -1211,6 +1268,26 @@ a:hover { color: var(--c-accent-hover); }
      3px daha dengeli: karakter 309px, gökyüzü 217px. */
   --unit: 3px;
 
+  /* Açılış ekranındaki ayrıklık: karakterler bu kadar dışta bekliyor,
+     tıklanınca 0'a yürüyorlar. `--unit` katı olması şart (piksel hizası). */
+  --ayrik: calc(22 * var(--unit));
+
+  /* Duruş anında gövde araligi. ELLERİ BULUŞTURAN DEĞER — deneysel:
+     gelinin içteki eli kendi tuval kenarından 8 kaynak piksel içeride,
+     damadın 2 piksel. İkisi merkeze doğru 5 birim kayınca eller
+     zeminden 95-113px bandında çakışıyor ve el ele tutuşmuş görünüyorlar.
+     Gövdeler çarpışmıyor: en dar nokta zaten ellerin bulunduğu yer. */
+  --ic-ofset: calc(5 * var(--unit));
+
+  /* Zemin cizgisinin alttan yuksekligi. Kapida tam ekran oldugu icin
+     asagi cekiliyor (bkz. .gate__scene .dugun-davetiye) - metin gokyuzunde,
+     cift zeminde kalsin. */
+  --zemin: 24%;
+
+  /* Alt yazi bloğunun (isim + tarih) alttan yuksekligi. Zemin degisince
+     bunun da kaymasi gerekiyor, yoksa yazi karakterlerin ayagina biner. */
+  --yazi-alt: 7%;
+
   position: relative;
   width: min(94vw, 640px);
   aspect-ratio: 5 / 6;
@@ -1240,7 +1317,7 @@ a:hover { color: var(--c-accent-hover); }
 @keyframes dd-parla { 0%, 70% { opacity: .75 } 71%, 100% { opacity: .2 } }
 
 .dugun-davetiye .zemin {
-  position: absolute; left: 0; right: 0; bottom: 24%;
+  position: absolute; left: 0; right: 0; bottom: var(--zemin);
   height: 2px; background: rgba(36, 31, 51, .35);
 }
 
@@ -1248,7 +1325,7 @@ a:hover { color: var(--c-accent-hover); }
    N = sprite'ın kaynak genişliği (gelin 60, damat 49). Boyları eşit çıkıyor
    çünkü iki sprite da 103 piksel yüksek. Bölüm başlığındaki ÖLÇEK notuna bak. */
 .dugun-davetiye .kisi {
-  position: absolute; bottom: 24%;
+  position: absolute; bottom: var(--zemin);
   /* `height: auto` ŞART. <img>'deki height="103"/height="142" öznitelikleri
      presentational hint olarak `height` özelliğine bağlanıyor; CSS'te height
      tanımlı olmazsa o hint kazanıyor ve resim 240x103 gibi EZİLMİŞ çiziliyor
@@ -1259,18 +1336,32 @@ a:hover { color: var(--c-accent-hover); }
 }
 .dugun-davetiye .gelin {
   width: calc(60 * var(--unit));
-  left: 50%; margin-left: calc(-60 * var(--unit) - 10px);
+  left: 50%; margin-left: calc(-60 * var(--unit) + var(--ic-ofset));
   animation: dd-gel-sol 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .6s 7;
 }
 .dugun-davetiye .damat {
   width: calc(49 * var(--unit));
-  left: 50%; margin-left: 10px;
+  left: 50%; margin-left: calc(-1 * var(--ic-ofset));
   animation: dd-gel-sag 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .75s 7;
 }
-@keyframes dd-gel-sol  { from { transform: translateX(-330px) } to { transform: translateX(0) } }
-@keyframes dd-gel-sag  { from { transform: translateX(330px) }  to { transform: translateX(0) } }
+
+/* Yürüyüş: kadraj dışından DEĞİL, açılış ekranındaki görünür ayrık
+   konumdan içeri. `both` fill sayesinde animasyon duraklatılmışken
+   karakterler `from` karesinde, yani ayrık ve görünür duruyorlar.
+
+   Mesafeler `--unit` katı: ondalık translate `pixelated` altında sprite'ı
+   piksel gridinin arasına düşürüp bulanıklaştırır, duruş karesi uzun süre
+   ekranda kaldığı için bu görünür olurdu. */
+@keyframes dd-gel-sol {
+  from { transform: translateX(calc(-1 * var(--ayrik))) }
+  to   { transform: translateX(0) }
+}
+@keyframes dd-gel-sag {
+  from { transform: translateX(var(--ayrik)) }
+  to   { transform: translateX(0) }
+}
 @keyframes dd-ziplama  { 0%, 100% { margin-bottom: 0 } 50% { margin-bottom: var(--unit) } }
 
 /* göz kırpma: kapalı kare açık karenin üstünde durur, opacity ile açılır */
@@ -1290,7 +1381,7 @@ a:hover { color: var(--c-accent-hover); }
    Formül: zemin (24%) + karakter boyu (103 * --unit) + 4 birim boşluk. */
 .dugun-davetiye .kalp {
   position: absolute; left: 50%; opacity: 0;
-  bottom: calc(24% + 107 * var(--unit));
+  bottom: calc(var(--zemin) + 107 * var(--unit));
   translate: -50% 0;
   animation: dd-kalp-cik .7s steps(3, end) 4.2s forwards,
              dd-kalp-nabiz 1.3s steps(2, end) 4.9s infinite;
@@ -1302,16 +1393,23 @@ a:hover { color: var(--c-accent-hover); }
 @keyframes dd-kalp-cik   { from { opacity: 0; scale: .3 } to { opacity: 1; scale: 1 } }
 @keyframes dd-kalp-nabiz { 0%, 100% { scale: 1 } 50% { scale: 1.18 } }
 
-/* konfeti */
+/* konfeti
+   Referans paket `translateY(115%)` kullanıyordu ve konfeti hiç düşmüyordu:
+   transform'daki yüzde ELEMENTİN KENDİ yüksekliğine göre hesaplanır, element
+   4px olduğu için hareket 4.6px'te kalıyordu. Sahne yüksekliği kadar gerçek
+   bir mesafe gerekiyor. */
+.dugun-davetiye {
+  --dus-mesafe: 105svh;   /* sahne tam ekran (kapı içinde) */
+}
 .dugun-davetiye .konfeti i {
   position: absolute; top: -12px; width: 4px; height: 4px;
   display: block; animation: dd-dus linear infinite;
 }
-@keyframes dd-dus { to { transform: translateY(115%) } }
+@keyframes dd-dus { to { transform: translateY(var(--dus-mesafe)) } }
 
 /* yazı */
 .dugun-davetiye .yazi {
-  position: absolute; left: 0; right: 0; bottom: 7%;
+  position: absolute; left: 0; right: 0; bottom: var(--yazi-alt);
   text-align: center; color: var(--ink); opacity: 0;
   animation: dd-belir 1.4s ease-out 5.2s forwards;
 }

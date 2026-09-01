@@ -1054,7 +1054,11 @@
   var PIXEL_SCENE_MS = 6600 + 900;
 
   function startPixelScene(onDone) {
-    var scenes = $$('[data-pixel-scene]');
+    // Çok kısa viewport'ta CSS sahneyi display:none yapıyor (style.css 07).
+    // O durumda 7.5 saniye boş beklemenin anlamı yok, kapı hemen kapansın.
+    var scenes = $$('[data-pixel-scene]').filter(function (dd) {
+      return dd.offsetParent !== null && dd.getBoundingClientRect().height > 0;
+    });
     if (!scenes.length) { onDone(); return null; }
 
     scenes.forEach(function (dd) { dd.classList.add('is-running'); });
