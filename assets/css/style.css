@@ -20,11 +20,16 @@
      16. Footer
      17. Partikül katmanı
      18. Scroll reveal
-     19. prefers-reduced-motion
+     19. Piksel davetiye sahnesi (.dugun-davetiye — kapsüllü)
+     20. prefers-reduced-motion
 
    KURAL: Sadece `transform` ve `opacity` animasyonu var.
    width/height/top/left/filter/box-shadow ANİMASYONU YOK.
    Tüm renk/spacing/font değerleri :root altındaki custom property'lerde.
+
+   TEK İSTİSNA: 19. bölüm (piksel davetiye sahnesi). Pixel art bileşeni kendi
+   token'larını `.dugun-davetiye` üzerinde tutar ve `dd-ziplama` margin-bottom
+   animasyonu kullanır — gerekçesi bölümün kendi başlığında yazıyor.
    ============================================================================= */
 
 
@@ -1079,7 +1084,151 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   19. prefers-reduced-motion
+   19. PİKSEL DAVETİYE SAHNESİ
+   -----------------------------------------------------------------------------
+   Kapsüllü bileşen: her kural `.dugun-davetiye` altında. Global'e taşımayın —
+   sahnenin kendi renk/ölçek token'ları var ve site token'larıyla çakışmamalı.
+
+   DOKUNULMAYACAKLAR (paket/OKU.md):
+     1) 11:8 ölçek oranı. Gelin `60 * --unit`, damat `68 * --unit * 0.727`.
+        İki sprite farklı çözünürlükte çizildi; 0.727 boylarını eşitliyor.
+        Tek ölçek kolu `--unit`.
+     2) `image-rendering: pixelated` — kalkarsa tarayıcı pikselleri yumuşatır.
+     3) `steps()` zamanlama — sürekli hareket karakteri piksel gridinin arasına
+        düşürür ve kenarlar titrer.
+
+   `dd-ziplama` neden margin-bottom animasyonu (dosya başındaki kuralın
+   istisnası): `transform` aynı elemanda `dd-gel-sol/sag` tarafından zaten
+   kullanılıyor, iki transform animasyonu birbirini ezer. Zıplama 1 `--unit`
+   (4px) ve `steps(2)` olduğu için layout maliyeti kareli ve sabit.
+
+   Yıldız (34) ve konfeti (46) elemanlarını app.js üretir; rastgele değerler
+   inline style'a bir kez yazılır. Sahne, viewport'a girene kadar `paused`
+   bekler — 5.2 saniyelik zaman çizelgesi kullanıcı görmeden akmasın.
+   ============================================================================= */
+
+.dugun-davetiye {
+  --dusk-top: #2d2a4a;
+  --dusk-mid: #5b4a6b;
+  --dusk-low: #c98f7d;
+  --dusk-glow: #f2c9a8;
+  --ink: #241f33;
+  --unit: 4px;              /* tek ölçek kolu: sahnenin tamamı buna bağlı */
+
+  position: relative;
+  width: min(94vw, 640px);
+  aspect-ratio: 5 / 6;
+  margin-inline: auto;
+  overflow: hidden;
+  /* Fontu siteden alıyor: --font-display = "Cormorant Garamond" (assets/fonts,
+     @font-face 01. bölümde). Harici CDN yok, ikinci font yüklemesi yok. */
+  font-family: var(--font-display);
+  background: linear-gradient(180deg,
+    var(--dusk-top) 0%, var(--dusk-mid) 42%,
+    var(--dusk-low) 74%, var(--dusk-glow) 100%);
+}
+
+.dugun-davetiye *,
+.dugun-davetiye *::before,
+.dugun-davetiye *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* gökyüzü */
+.dugun-davetiye .yildiz {
+  position: absolute; width: 2px; height: 2px;
+  background: #fff; opacity: .7;
+  animation: dd-parla 3s steps(2, end) infinite;
+}
+@keyframes dd-parla { 0%, 70% { opacity: .75 } 71%, 100% { opacity: .2 } }
+
+.dugun-davetiye .zemin {
+  position: absolute; left: 0; right: 0; bottom: 24%;
+  height: 2px; background: rgba(36, 31, 51, .35);
+}
+
+/* karakterler — 11:8 oranı burada kilitli, bozma */
+.dugun-davetiye .kisi {
+  position: absolute; bottom: 24%;
+  image-rendering: pixelated;
+}
+.dugun-davetiye .gelin {
+  width: calc(60 * var(--unit));
+  left: 50%; margin-left: calc(-60 * var(--unit) - 10px);
+  animation: dd-gel-sol 3.4s steps(34, end) .6s both,
+             dd-ziplama .5s steps(2, end) .6s 7;
+}
+.dugun-davetiye .damat {
+  width: calc(68 * var(--unit) * 0.727);
+  left: 50%; margin-left: 10px;
+  animation: dd-gel-sag 3.4s steps(34, end) .6s both,
+             dd-ziplama .5s steps(2, end) .75s 7;
+}
+@keyframes dd-gel-sol  { from { transform: translateX(-330px) } to { transform: translateX(0) } }
+@keyframes dd-gel-sag  { from { transform: translateX(330px) }  to { transform: translateX(0) } }
+@keyframes dd-ziplama  { 0%, 100% { margin-bottom: 0 } 50% { margin-bottom: var(--unit) } }
+
+/* göz kırpma: kapalı kare açık karenin üstünde durur, opacity ile açılır */
+.dugun-davetiye .kirpik { opacity: 0; }
+.dugun-davetiye .gelin.kirpik { animation: dd-gel-sol 3.4s steps(34, end) .6s both,
+                                           dd-kirp 5.6s steps(1, end) 4.4s infinite; }
+.dugun-davetiye .damat.kirpik { animation: dd-gel-sag 3.4s steps(34, end) .6s both,
+                                           dd-kirp 6.9s steps(1, end) 5.2s infinite; }
+@keyframes dd-kirp { 0%, 96% { opacity: 0 } 97%, 100% { opacity: 1 } }
+
+/* kalp */
+.dugun-davetiye .kalp {
+  position: absolute; left: 50%; bottom: 58%; translate: -50% 0; opacity: 0;
+  animation: dd-kalp-cik .7s steps(3, end) 4.2s forwards,
+             dd-kalp-nabiz 1.3s steps(2, end) 4.9s infinite;
+}
+.dugun-davetiye .kalp svg {
+  display: block; width: calc(11 * var(--unit)); height: auto;
+  image-rendering: pixelated;
+}
+@keyframes dd-kalp-cik   { from { opacity: 0; scale: .3 } to { opacity: 1; scale: 1 } }
+@keyframes dd-kalp-nabiz { 0%, 100% { scale: 1 } 50% { scale: 1.18 } }
+
+/* konfeti */
+.dugun-davetiye .konfeti i {
+  position: absolute; top: -12px; width: 4px; height: 4px;
+  display: block; animation: dd-dus linear infinite;
+}
+@keyframes dd-dus { to { transform: translateY(115%) } }
+
+/* yazı */
+.dugun-davetiye .yazi {
+  position: absolute; left: 0; right: 0; bottom: 7%;
+  text-align: center; color: var(--ink); opacity: 0;
+  animation: dd-belir 1.4s ease-out 5.2s forwards;
+}
+.dugun-davetiye .isimler {
+  font-size: clamp(26px, 6.4vw, 40px); font-weight: 300; letter-spacing: .02em;
+}
+.dugun-davetiye .ve { font-style: italic; opacity: .62; padding: 0 .28em; }
+.dugun-davetiye .tarih {
+  margin-top: .5em; font-size: clamp(12px, 2.7vw, 15px);
+  letter-spacing: .34em; opacity: .72;
+}
+@keyframes dd-belir { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+
+/* Sahne görünene kadar beklet; app.js IntersectionObserver ile .is-running
+   ekler, JS yoksa .no-js kaçışı yine başlatır.
+
+   BU BLOK BÖLÜMÜN SONUNDA DURMAK ZORUNDA. Yukarıdaki kuralların hepsi
+   `animation` KISAYOLUNU kullanıyor ve kısayol, yazılmayan alt özellikleri
+   ilk değerine sıfırlıyor — yani `animation-play-state: running`. Aynı
+   specificity'de (0,2,0) olduğumuz için kazanan kaynak sırasıyla belirlenir:
+   bu kural kısayolların ÜSTÜNDE olursa duraklatma hiç uygulanmaz ve 5.2s'lik
+   çizelge kullanıcı sahneyi görmeden akıp biter.
+
+   `!important` bilinçli olarak YOK: 20. bölümdeki reduced-motion kuralı
+   `running !important` ile bunu ezebilsin (o kuralın specificity'si daha
+   düşük, sadece !important sayesinde kazanıyor). */
+.dugun-davetiye:not(.is-running) * { animation-play-state: paused; }
+.no-js .dugun-davetiye * { animation-play-state: running; }
+
+
+/* =============================================================================
+   20. prefers-reduced-motion
    -----------------------------------------------------------------------------
    Ken Burns, partiküller ve reveal animasyonları kapatılır.
    ============================================================================= */
@@ -1105,4 +1254,17 @@ a:hover { color: var(--c-accent-hover); }
   .gate { transition-duration: 200ms; }
 
   .spinner { animation-duration: 2s; }
+
+  /* Piksel sahnesi: hareket yok, son kare gösterilir. animation-play-state
+     zorlanıyor çünkü `paused` bekletmesi burada sahneyi donduracaktı. */
+  .dugun-davetiye *,
+  .dugun-davetiye *::before,
+  .dugun-davetiye *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-play-state: running !important;
+  }
+  .dugun-davetiye .yazi,
+  .dugun-davetiye .kalp { opacity: 1; }
+  .dugun-davetiye .kirpik { display: none; }
 }

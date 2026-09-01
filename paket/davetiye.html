@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Davetiye</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./davetiye.css">
+</head>
+<body style="background:#241f33; display:grid; place-items:center; min-height:100vh; margin:0">
+
+<!-- ==== BURADAN AŞAĞISI SİTEYE TAŞINACAK BİLEŞEN ==== -->
+<div class="dugun-davetiye">
+  <div class="gokyuzu"></div>
+  <div class="zemin"></div>
+
+  <img class="kisi gelin" alt="" src="./img/gelin.png" width="60" height="103">
+  <img class="kisi gelin kirpik" alt="" src="./img/gelin-blink.png" width="60" height="103">
+  <img class="kisi damat" alt="" src="./img/damat.png" width="68" height="142">
+  <img class="kisi damat kirpik" alt="" src="./img/damat-blink.png" width="68" height="142">
+
+  <div class="kalp">
+    <svg viewBox="0 0 11 10" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">
+      <path fill="#d4566b" d="M2 1h3v1h1V1h3v1h1v3h-1v1h-1v1h-1v1H6v1H5V8H4V7H3V6H2V5H1V2h1z"/>
+      <path fill="#f08ba0" d="M2 2h2v1H3v1H2z"/>
+    </svg>
+  </div>
+
+  <div class="konfeti"></div>
+
+  <div class="yazi">
+    <p class="isimler">Ece<span class="ve">ve</span>İsmail</p>
+    <p class="tarih">26 Eylül 2026 · Cumartesi</p>
+  </div>
+</div>
+<!-- ==== BİLEŞEN SONU ==== -->
+
+<script>
+// Yıldız ve konfetiyi JS üretiyor; 80 tane <div> elle yazmamak için.
+// Framework'e taşırken bu mantığı bileşenin mount/useEffect'ine koy.
+document.querySelectorAll('.dugun-davetiye').forEach(function (sahne) {
+  var gok = sahne.querySelector('.gokyuzu');
+  for (var i = 0; i < 34; i++) {
+    var s = document.createElement('div');
+    s.className = 'yildiz';
+    s.style.left = (Math.random() * 100).toFixed(1) + '%';
+    s.style.top = (Math.random() * 46).toFixed(1) + '%';
+    s.style.animationDelay = (Math.random() * 3).toFixed(2) + 's';
+    gok.appendChild(s);
+  }
+
+  var kutu = sahne.querySelector('.konfeti');
+  var renkler = ['#f2c9a8', '#d4566b', '#f7f1e8', '#e8b04b', '#a8c4d8'];
+  for (var j = 0; j < 46; j++) {
+    var c = document.createElement('i');
+    c.style.left = (Math.random() * 100).toFixed(1) + '%';
+    c.style.background = renkler[j % renkler.length];
+    c.style.animationDuration = (2.8 + Math.random() * 2.6).toFixed(2) + 's';
+    c.style.animationDelay = (4.4 + Math.random() * 5).toFixed(2) + 's';
+    kutu.appendChild(c);
+  }
+});
+</script>
+</body>
+</html>

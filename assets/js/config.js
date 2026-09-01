@@ -19,13 +19,13 @@ window.CONFIG = {
 
   /* ----------------------------------------------------------- Tarih & saat */
   // Kaynak tarih. Geri sayım, takvim linki ve RSVP mantığı bunu kullanır.
-  dateISO: "2027-06-12T18:30:00+03:00",
+  dateISO: "2026-09-26T18:30:00+03:00",
   // Takvim kaydının bitişi (Google Calendar + invite.ics için gerekli).
-  endISO: "2027-06-12T23:30:00+03:00",
+  endISO: "2026-09-26T23:30:00+03:00",
 
   // Ekranda görünen serbest metinler. Bilinçli olarak elle yazılıyor:
   // WhatsApp içi eski WebView'larda toLocaleDateString('tr-TR') tutarsız.
-  dateLabel: "12 Haziran 2027 · Cumartesi",
+  dateLabel: "26 Eylül 2026 · Cumartesi",
   timeLabel: "18:30",
 
   /* ------------------------------------------------------------------ Mekân */

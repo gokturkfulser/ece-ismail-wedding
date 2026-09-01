@@ -17,7 +17,8 @@
      10. RSVP
      11. Scroll reveal
      12. Partiküller
-     13. Başlat
+     13. Piksel davetiye sahnesi
+     14. Başlat
    ============================================================================= */
 
 (function () {
@@ -939,7 +940,88 @@
 
 
   /* ==========================================================================
-     13. BAŞLAT
+     13. PİKSEL DAVETİYE SAHNESİ
+     -----------------------------------------------------------------------
+     34 yıldız + 46 konfeti elemanını burada üretiyoruz; 80 <div>'i elle
+     yazmamak için. Rastgele değerler SADECE BİR KEZ üretilir: bu fonksiyon
+     init()'te tek sefer çalışır, ürettiği değerler inline style'a yazılır ve
+     bir daha dokunulmaz. Sahne yeniden çizilse bile yıldızlar yerinden
+     oynamaz (idempotent: `dd.__built` bayrağı ikinci üretimi engeller).
+
+     Stil style.css 19. bölümde. Zaman çizelgesi (saniye):
+       0.6 giriş · 4.0 buluşma · 4.2 kalp · 4.4 konfeti · 5.2 yazı
+
+     Sahne viewport'a girene kadar CSS `animation-play-state: paused` ile
+     bekler; .is-running eklenince 5.2 saniyelik çizelge baştan akar. Aksi
+     halde kullanıcı sayfanın tepesindeyken animasyon çoktan bitmiş olurdu.
+     ========================================================================== */
+
+  var PIXEL_STAR_COUNT = 34;
+  var PIXEL_CONFETTI_COUNT = 46;
+  var PIXEL_CONFETTI_COLORS = ['#f2c9a8', '#d4566b', '#f7f1e8', '#e8b04b', '#a8c4d8'];
+
+  function buildPixelScene(dd) {
+    if (dd.__built) return;          // rastgele değerler bir kez üretilir
+    dd.__built = true;
+
+    var sky = $('.gokyuzu', dd);
+    if (sky) {
+      var starFrag = document.createDocumentFragment();
+      for (var i = 0; i < PIXEL_STAR_COUNT; i++) {
+        var star = el('div', { class: 'yildiz' });
+        star.style.left = randBetween(0, 100).toFixed(1) + '%';
+        // Yıldızlar sadece üst yarıda: 46% altı gökyüzü değil, ufuk çizgisi.
+        star.style.top = randBetween(0, 46).toFixed(1) + '%';
+        star.style.animationDelay = randBetween(0, 3).toFixed(2) + 's';
+        starFrag.appendChild(star);
+      }
+      sky.appendChild(starFrag);
+    }
+
+    var box = $('.konfeti', dd);
+    if (box) {
+      var confettiFrag = document.createDocumentFragment();
+      for (var j = 0; j < PIXEL_CONFETTI_COUNT; j++) {
+        var piece = el('i');
+        piece.style.left = randBetween(0, 100).toFixed(1) + '%';
+        // Renk sırayla dağıtılıyor (rastgele değil) — beş renk eşit dursun
+        piece.style.background = PIXEL_CONFETTI_COLORS[j % PIXEL_CONFETTI_COLORS.length];
+        piece.style.animationDuration = randBetween(2.8, 5.4).toFixed(2) + 's';
+        // 4.4s = konfetinin çizelgedeki başlangıcı; üstüne 0-5s dağılma
+        piece.style.animationDelay = randBetween(4.4, 9.4).toFixed(2) + 's';
+        confettiFrag.appendChild(piece);
+      }
+      box.appendChild(confettiFrag);
+    }
+  }
+
+  function setupPixelScene() {
+    var scenes = $$('[data-pixel-scene]');
+    if (!scenes.length) return;
+
+    scenes.forEach(buildPixelScene);
+
+    // Hareket azaltma tercihinde ya da IntersectionObserver yoksa bekletmeden
+    // başlat — CSS zaten süreleri .01ms'e indirip son kareyi gösteriyor.
+    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+      scenes.forEach(function (dd) { dd.classList.add('is-running'); });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-running');
+        observer.unobserve(entry.target);   // tek seferlik
+      });
+    }, { threshold: 0.35 });
+
+    scenes.forEach(function (dd) { observer.observe(dd); });
+  }
+
+
+  /* ==========================================================================
+     14. BAŞLAT
      ========================================================================== */
 
   function renderGreeting() {
@@ -971,6 +1053,7 @@
 
     setupReveal();
     setupParticles();
+    setupPixelScene();
 
     // Kapı ekranı yoksa (ör. elle kaldırıldıysa) slideshow yine başlasın
     if (!$('#gate')) startHeroSlideshow();
