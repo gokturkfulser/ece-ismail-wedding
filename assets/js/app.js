@@ -271,6 +271,12 @@
      Müzik dosyası butona basılana kadar YÜKLENMEZ (Audio nesnesi o an kurulur).
      Autoplay policy gereği ses ancak bu kullanıcı jestiyle başlayabilir.
      Ses 0'dan hedefe fade-in yapar, ani patlamaz.
+
+     Kapı iki aşamalı:
+       1) Karşılama (isim/tarih/buton)
+       2) Butona basılınca piksel davetiye sahnesi oynar (~7.5s), sonra kapanır.
+     Atlama: "Atla" butonu, kapıya tıklama veya Esc.
+     prefers-reduced-motion açıkken 2. aşama atlanır, kapı direkt kapanır.
      ========================================================================== */
 
   var audio = null;
@@ -369,6 +375,7 @@
   function setupGate() {
     var gate = $('#gate');
     var button = $('#gate-open');
+    var skip = $('#gate-skip');
     if (!gate || !button) return;
 
     document.body.classList.add('is-locked');
@@ -379,14 +386,15 @@
       if (hint) hint.remove();
     }
 
-    var opened = false;
+    var opened = false;    // butona basıldı, 2. aşama başladı
+    var closing = false;   // kapanış başladı (tek yönlü)
+    var sceneTimer = null;
 
-    function open() {
-      if (opened) return;
-      opened = true;
-
-      startMusic();          // kullanıcı jesti burada — autoplay policy tamam
-      startHeroSlideshow();
+    // --- Kapanış: 2. aşama bitince ya da atlanınca --------------------------
+    function close() {
+      if (closing) return;
+      closing = true;
+      if (sceneTimer) { window.clearTimeout(sceneTimer); sceneTimer = null; }
 
       gate.classList.add('is-closing');
       document.body.classList.remove('is-locked');
@@ -406,7 +414,46 @@
       window.setTimeout(remove, 1400);
     }
 
+    // --- Açılış: butona basıldı --------------------------------------------
+    function open() {
+      if (opened) return;
+      opened = true;
+
+      startMusic();          // kullanıcı jesti burada — autoplay policy tamam
+      startHeroSlideshow();
+
+      // Hareket azaltma tercihinde animasyon aşamasını HİÇ oynatmıyoruz;
+      // süreler .01ms'e indiği için oynatmak boş bir bekleme olurdu.
+      if (prefersReducedMotion) { close(); return; }
+
+      gate.classList.add('is-playing');
+      if (skip) skip.classList.remove('is-hidden');
+      sceneTimer = startPixelScene(close);
+    }
+
     button.addEventListener('click', open);
+
+    if (skip) {
+      skip.addEventListener('click', function (event) {
+        event.stopPropagation();
+        close();
+      });
+    }
+
+    // Sahne oynarken kapının herhangi bir yerine tıklamak da atlar.
+    // "DAVETİYEYİ AÇ" tıklaması buraya kadar bubble ettiği için butonu
+    // ayıklıyoruz — yoksa aynı tıklama sahneyi hem başlatıp hem atlardı.
+    gate.addEventListener('click', function (event) {
+      if (!opened || closing) return;
+      if (event.target === button || button.contains(event.target)) return;
+      close();
+    });
+
+    // Esc ile atla
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape' && event.keyCode !== 27) return;
+      if (opened && !closing) close();
+    });
   }
 
 
@@ -951,9 +998,10 @@
      Stil style.css 19. bölümde. Zaman çizelgesi (saniye):
        0.6 giriş · 4.0 buluşma · 4.2 kalp · 4.4 konfeti · 5.2 yazı
 
-     Sahne viewport'a girene kadar CSS `animation-play-state: paused` ile
-     bekler; .is-running eklenince 5.2 saniyelik çizelge baştan akar. Aksi
-     halde kullanıcı sayfanın tepesindeyken animasyon çoktan bitmiş olurdu.
+     Sahne kapı ekranının 2. aşamasında yaşıyor. CSS `animation-play-state:
+     paused` ile bekler; kapı butonuna basılınca startPixelScene() .is-running
+     ekler ve çizelge baştan akar. Yıldız/konfeti üretimi init'te yapılır ki
+     tıklama anında ilk kare hazır olsun.
      ========================================================================== */
 
   var PIXEL_STAR_COUNT = 34;
@@ -995,28 +1043,22 @@
     }
   }
 
+  // Yıldız/konfetiyi init'te üretiyoruz ki kapı butonuna basıldığı an sahne
+  // hazır olsun; üretimi tıklamaya bırakmak ilk kareyi geciktirirdi.
   function setupPixelScene() {
+    $$('[data-pixel-scene]').forEach(buildPixelScene);
+  }
+
+  // Çizelgenin toplam süresi: yazı 5.2s'te başlar + 1.4s belirme = 6.6s.
+  // Üstüne kısa bir duruş ekliyoruz, sonra kapı kapanır.
+  var PIXEL_SCENE_MS = 6600 + 900;
+
+  function startPixelScene(onDone) {
     var scenes = $$('[data-pixel-scene]');
-    if (!scenes.length) return;
+    if (!scenes.length) { onDone(); return null; }
 
-    scenes.forEach(buildPixelScene);
-
-    // Hareket azaltma tercihinde ya da IntersectionObserver yoksa bekletmeden
-    // başlat — CSS zaten süreleri .01ms'e indirip son kareyi gösteriyor.
-    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
-      scenes.forEach(function (dd) { dd.classList.add('is-running'); });
-      return;
-    }
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-running');
-        observer.unobserve(entry.target);   // tek seferlik
-      });
-    }, { threshold: 0.35 });
-
-    scenes.forEach(function (dd) { observer.observe(dd); });
+    scenes.forEach(function (dd) { dd.classList.add('is-running'); });
+    return window.setTimeout(onDone, PIXEL_SCENE_MS);
   }
 
 

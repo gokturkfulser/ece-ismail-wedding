@@ -4,10 +4,10 @@ PRODID:-//ece-ismail-wedding//Davetiye//TR
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-UID:dugun-2027-06-12@ece-ismail-wedding
+UID:dugun-2026-09-26@ece-ismail-wedding
 DTSTAMP:20260901T090000Z
-DTSTART:20270612T153000Z
-DTEND:20270612T203000Z
+DTSTART:20260926T153000Z
+DTEND:20260926T203000Z
 SUMMARY:Ece & İsmail Düğün Töreni
 LOCATION:Örnek Kır Bahçesi\, Örnek Mah. Örnek Cad. No: 1\, Beykoz / İstanbul
 DESCRIPTION:Ece ve İsmail'in düğün töreni.\nMekân: Örnek Kır Bahçesi\nSaat: 18:30

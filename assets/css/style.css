@@ -462,7 +462,10 @@ a:hover { color: var(--c-accent-hover); }
   position: absolute;
   inset: 0;
   z-index: 0;
+  transition: opacity var(--dur-slow) var(--ease);
 }
+/* 2. aşamada fotoğraf sahneyle yarışmasın; sahne kendi gökyüzünü getiriyor. */
+.gate.is-playing .gate__media { opacity: 0; }
 .gate__media img {
   width: 100%;
   height: 100%;
@@ -514,6 +517,66 @@ a:hover { color: var(--c-accent-hover); }
   color: var(--c-text-invert-soft);
   margin: var(--sp-4) 0 0;
   letter-spacing: var(--ls-wide);
+}
+
+/* --- 2. aşama: piksel davetiye sahnesi ------------------------------------
+   Sahnenin kendi stili 19. bölümde ve `.dugun-davetiye` altında kapsüllü.
+   Burada SADECE kapı içindeki yerleşimi ve aşama geçişi var.             */
+
+.gate__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* visibility gecikmeli kapanır: fade-out bitmeden gizlenmesin */
+  transition: opacity var(--dur-slow) var(--ease-out),
+              visibility 0s linear var(--dur-slow);
+}
+
+.gate.is-playing .gate__scene {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* Karşılama aşaması solar ama DOM'DA KALIR — #gate-names, .gate'in
+   aria-labelledby hedefi, display:none olursa erişilebilirlik adı kopar. */
+.gate.is-playing .gate__content {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+
+/* Animasyonu atla. Sahne başlayınca JS is-hidden'ı kaldırır. */
+.gate__skip {
+  position: absolute;
+  z-index: 4;
+  right: var(--sp-5);
+  bottom: var(--sp-5);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--c-text-invert-soft);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--c-text-invert-soft);
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease),
+              color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+.gate.is-playing .gate__skip { opacity: 1; }
+.gate__skip:hover,
+.gate__skip:focus-visible {
+  color: var(--c-text-invert);
+  border-color: var(--c-text-invert);
 }
 
 
@@ -1089,13 +1152,35 @@ a:hover { color: var(--c-accent-hover); }
    Kapsüllü bileşen: her kural `.dugun-davetiye` altında. Global'e taşımayın —
    sahnenin kendi renk/ölçek token'ları var ve site token'larıyla çakışmamalı.
 
-   DOKUNULMAYACAKLAR (paket/OKU.md):
-     1) 11:8 ölçek oranı. Gelin `60 * --unit`, damat `68 * --unit * 0.727`.
-        İki sprite farklı çözünürlükte çizildi; 0.727 boylarını eşitliyor.
-        Tek ölçek kolu `--unit`.
-     2) `image-rendering: pixelated` — kalkarsa tarayıcı pikselleri yumuşatır.
-     3) `steps()` zamanlama — sürekli hareket karakteri piksel gridinin arasına
+   ÖLÇEK: ORTAK GRID — `--unit` TEK KOL, ÇARPAN YOK
+   -----------------------------------------------------------------------------
+   Gelin `60 * --unit`, damat `49 * --unit`. İki sprite da 103 piksel yüksek,
+   yani aynı piksel yoğunluğunda çizilmiş; `--unit` ikisini de aynı TAM SAYI
+   katta büyütüyor ve boyları kendiliğinden eşit çıkıyor.
+
+   Eski 11:8 / 0.727 çarpanı BİLİNÇLİ OLARAK KALDIRILDI (paket/OKU.md onu
+   korumayı söylüyor, gerekçesiyle birlikte iptal edildi):
+
+     0.727 = 8/11. Doğru çalışması için `--unit`in 11'in katı olması gerekir;
+     referans paket ise `--unit: 4px` ile geliyor. 4, 11'in katı olmadığı için
+     damat 2.908x ile ölçekleniyordu ve `pixelated` altında 68 kaynak
+     sütunundan 62'si ekranda 3px, 6'sı 2px genişliğinde çiziliyordu — piksel
+     gridi düzensizdi. Gelin tam 4.000x olduğu için temiz görünüyordu; yan yana
+     bakıldığında ikisi farklı ölçekten gelmiş gibi duruyordu.
+
+     11:8'i tam sayı tutan en küçük ölçek gelin 660x1133 / damat 544x1136.
+     Karakterler zemin çizgisinin üstünde durduğu için bu ~1490px yüksek bir
+     panel ister; hiçbir gerçek ekrana sığmıyor, k=1 altında ara değer de yok.
+
+     Çözüm çarpanı ayarlamak değil, damadı gelinin yoğunluğunda yeniden
+     çizmekti (68x142 -> 49x103). Böylece oran hack'ine hiç gerek kalmıyor.
+
+   DOKUNULMAYACAKLAR:
+     1) `image-rendering: pixelated` — kalkarsa tarayıcı pikselleri yumuşatır.
+     2) `steps()` zamanlama — sürekli hareket karakteri piksel gridinin arasına
         düşürür ve kenarlar titrer.
+     3) `--unit` TAM SAYI px kalmalı. Ondalık değer (clamp()/vw tabanlı akışkan
+        ölçek dahil) grid düzensizliğini geri getirir.
 
    `dd-ziplama` neden margin-bottom animasyonu (dosya başındaki kuralın
    istisnası): `transform` aynı elemanda `dd-gel-sol/sag` tarafından zaten
@@ -1103,8 +1188,15 @@ a:hover { color: var(--c-accent-hover); }
    (4px) ve `steps(2)` olduğu için layout maliyeti kareli ve sabit.
 
    Yıldız (34) ve konfeti (46) elemanlarını app.js üretir; rastgele değerler
-   inline style'a bir kez yazılır. Sahne, viewport'a girene kadar `paused`
-   bekler — 5.2 saniyelik zaman çizelgesi kullanıcı görmeden akmasın.
+   inline style'a bir kez yazılır. Sahne `.is-running` eklenene kadar `paused`
+   bekler — kapı butonuna basılana kadar çizelge akmasın. Sahne kapı ekranının
+   2. aşamasında yaşıyor (07. bölüm, `.gate__scene`).
+
+   >>> BEKLEYEN İŞ: assets/img/damat.png ve damat-blink.png hâlâ ESKİ 68x142
+   sprite'lar. CSS yukarıda 49x103 varsayıyor; yeni sprite gelene kadar damat
+   2.882x ile ölçeklenmeye devam eder (eski haliyle aynı, daha kötü değil).
+   Yeni PNG'ler düşünce yapılacak tek şey: index.html'deki dört `width`/`height`
+   özniteliğinden damadın ikisini 49/103 yapmak. CSS'te değişiklik gerekmiyor.
    ============================================================================= */
 
 .dugun-davetiye {
@@ -1113,11 +1205,18 @@ a:hover { color: var(--c-accent-hover); }
   --dusk-low: #c98f7d;
   --dusk-glow: #f2c9a8;
   --ink: #241f33;
-  --unit: 4px;              /* tek ölçek kolu: sahnenin tamamı buna bağlı */
+  /* Tek ölçek kolu: sahnenin tamamı buna bağlı. TAM SAYI px kalmalı.
+     Referans 4px'ti; `height: auto` düzeltmesiyle karakterler gerçek
+     oranlarına (4 kat uzun) kavuşunca 4px gökyüzüne 114px bırakıyordu.
+     3px daha dengeli: karakter 309px, gökyüzü 217px. */
+  --unit: 3px;
 
   position: relative;
   width: min(94vw, 640px);
   aspect-ratio: 5 / 6;
+  /* Kapı tam ekran; sahne dikeyde taşmasın. aspect-ratio korunduğu için
+     yükseklik sınıra dayandığında genişlik kendiliğinden küçülür. */
+  max-height: 86svh;
   margin-inline: auto;
   overflow: hidden;
   /* Fontu siteden alıyor: --font-display = "Cormorant Garamond" (assets/fonts,
@@ -1145,9 +1244,17 @@ a:hover { color: var(--c-accent-hover); }
   height: 2px; background: rgba(36, 31, 51, .35);
 }
 
-/* karakterler — 11:8 oranı burada kilitli, bozma */
+/* karakterler — ortak grid: ikisi de `N * --unit`, çarpan yok.
+   N = sprite'ın kaynak genişliği (gelin 60, damat 49). Boyları eşit çıkıyor
+   çünkü iki sprite da 103 piksel yüksek. Bölüm başlığındaki ÖLÇEK notuna bak. */
 .dugun-davetiye .kisi {
   position: absolute; bottom: 24%;
+  /* `height: auto` ŞART. <img>'deki height="103"/height="142" öznitelikleri
+     presentational hint olarak `height` özelliğine bağlanıyor; CSS'te height
+     tanımlı olmazsa o hint kazanıyor ve resim 240x103 gibi EZİLMİŞ çiziliyor
+     (60:103 dikey oran, 240:103 yatay orana dönüyordu). Öznitelikler duruyor
+     çünkü yüklenmeden önceki oranı verip CLS'i 0'da tutuyorlar. */
+  height: auto;
   image-rendering: pixelated;
 }
 .dugun-davetiye .gelin {
@@ -1157,7 +1264,7 @@ a:hover { color: var(--c-accent-hover); }
              dd-ziplama .5s steps(2, end) .6s 7;
 }
 .dugun-davetiye .damat {
-  width: calc(68 * var(--unit) * 0.727);
+  width: calc(49 * var(--unit));
   left: 50%; margin-left: 10px;
   animation: dd-gel-sag 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .75s 7;
@@ -1174,9 +1281,17 @@ a:hover { color: var(--c-accent-hover); }
                                            dd-kirp 6.9s steps(1, end) 5.2s infinite; }
 @keyframes dd-kirp { 0%, 96% { opacity: 0 } 97%, 100% { opacity: 1 } }
 
-/* kalp */
+/* kalp — konumu KARAKTER BOYUNA bağlı, panel yüzdesine değil.
+   Referansta `bottom: 58%`ti; karakterler ezik (103px) çizildiği sürece bu
+   başların üstüne düşüyordu. `height: auto` düzeltmesiyle karakterler gerçek
+   boyuna kavuşunca 58% gelinin omzuna bindi. Sabit yüzde de çözmüyor: panel
+   yüksekliği vh ile, karakter `--unit` ile ölçeklendiği için ikisinin oranı
+   her ekranda değişiyor ve küçük ekranda kalp yine başlara biniyordu.
+   Formül: zemin (24%) + karakter boyu (103 * --unit) + 4 birim boşluk. */
 .dugun-davetiye .kalp {
-  position: absolute; left: 50%; bottom: 58%; translate: -50% 0; opacity: 0;
+  position: absolute; left: 50%; opacity: 0;
+  bottom: calc(24% + 107 * var(--unit));
+  translate: -50% 0;
   animation: dd-kalp-cik .7s steps(3, end) 4.2s forwards,
              dd-kalp-nabiz 1.3s steps(2, end) 4.9s infinite;
 }
@@ -1225,6 +1340,16 @@ a:hover { color: var(--c-accent-hover); }
    düşük, sadece !important sayesinde kazanıyor). */
 .dugun-davetiye:not(.is-running) * { animation-play-state: paused; }
 .no-js .dugun-davetiye * { animation-play-state: running; }
+
+/* Küçük ekranlarda ölçeği düşür. DEĞER BİLİNÇLİ OLARAK TAM SAYI px:
+   `--unit` ondalık olursa kaynak pikseller ekranda eşit genişlikte
+   çizilmez (bir kısmı 3px, bir kısmı 2px olur) ve piksel gridi titrer.
+   clamp()/vw tabanlı akışkan ölçek bu yüzden KULLANILMADI.
+
+   Eşik hesabı: --unit 3px'te iki karakter yan yana 60*3 + 49*3 = 327px.
+   Panel 94vw olduğu için 416px'lik ekranda panel 391px — sığıyor. Altında
+   2px'e düşüyoruz (218px). */
+@media (max-width: 26rem) { .dugun-davetiye { --unit: 2px; } }
 
 
 /* =============================================================================

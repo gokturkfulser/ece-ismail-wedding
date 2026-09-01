@@ -16,9 +16,9 @@
        ========================================================================== -->
 
   <!-- CONFIG İLE EŞLE: bride + coupleSeparator + groom, dateLabel -->
-  <title>Ece &amp; İsmail · 12 Haziran 2027</title>
+  <title>Ece &amp; İsmail · 26 Eylül 2026</title>
   <!-- CONFIG İLE EŞLE: text.inviteBody[0] özeti -->
-  <meta name="description" content="Ece ve İsmail'in düğün davetiyesi. 12 Haziran 2027, Örnek Kır Bahçesi. Katılım bildirimi için tıklayın.">
+  <meta name="description" content="Ece ve İsmail'in düğün davetiyesi. 26 Eylül 2026, Örnek Kır Bahçesi. Katılım bildirimi için tıklayın.">
 
   <!-- CONFIG İLE EŞLE: --c-bg-dark (assets/css/style.css) -->
   <meta name="theme-color" content="#1f3d2b">
@@ -30,7 +30,7 @@
   <!-- CONFIG İLE EŞLE -->
   <meta property="og:site_name" content="Ece &amp; İsmail">
   <meta property="og:title" content="Ece &amp; İsmail · Düğün Davetiyesi">
-  <meta property="og:description" content="12 Haziran 2027, Cumartesi · 18:30 · Örnek Kır Bahçesi. Katılım bildirimi için davetiyeyi açın.">
+  <meta property="og:description" content="26 Eylül 2026, Cumartesi · 18:30 · Örnek Kır Bahçesi. Katılım bildirimi için davetiyeyi açın.">
   <!-- TAM URL GEREKLİ — kendi Pages adresinle değiştir -->
   <meta property="og:url" content="https://KULLANICI.github.io/DEPO/">
   <meta property="og:image" content="https://KULLANICI.github.io/DEPO/assets/img/og.png">
@@ -44,7 +44,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <!-- CONFIG İLE EŞLE -->
   <meta name="twitter:title" content="Ece &amp; İsmail · Düğün Davetiyesi">
-  <meta name="twitter:description" content="12 Haziran 2027, Cumartesi · 18:30 · Örnek Kır Bahçesi.">
+  <meta name="twitter:description" content="26 Eylül 2026, Cumartesi · 18:30 · Örnek Kır Bahçesi.">
   <meta name="twitter:image" content="https://KULLANICI.github.io/DEPO/assets/img/og.png">
   <meta name="twitter:image:alt" content="Ece ve İsmail düğün davetiyesi">
 
@@ -89,8 +89,15 @@
   <!-- ==========================================================================
        KAPI EKRANI
        --------------------------------------------------------------------------
-       Tam ekran. Butona basılınca app.js müziği başlatır, kapıyı fade-out yapar
-       ve elementi DOM'dan kaldırır.
+       Tam ekran, iki aşamalı:
+         1) Karşılama: isim/tarih + "DAVETİYEYİ AÇ" butonu
+         2) Butona basılınca → müzik başlar, karşılama solar, PİKSEL SAHNESİ
+            oynar (karakterler yürür, buluşur, el ele tutuşur), sonra kapı
+            fade-out olur ve element DOM'dan kaldırılır.
+
+       Müzik MUTLAKA butonun click handler'ında başlar (autoplay policy).
+       Animasyon uzun sürdüğü için "Atla" butonu var; kapıya tıklamak da atlar.
+       prefers-reduced-motion açıksa 2. aşama hiç oynatılmaz, kapı direkt kapanır.
        ========================================================================== -->
   <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-names">
     <div class="gate__media scrim" id="gate-media"><!-- CONFIG.gate → app.js --></div>
@@ -110,6 +117,67 @@
 
       <p class="gate__hint" id="gate-hint" data-text="text.gateHint"></p>
     </div>
+
+    <!-- ------------------------------------------------------------------------
+         PİKSEL DAVETİYE SAHNESİ (kapı 2. aşama)
+         ------------------------------------------------------------------------
+         Kapsüllü bileşen (.dugun-davetiye). Stili style.css 19. bölümde,
+         yıldız/konfeti üretimi app.js setupPixelScene() içinde.
+
+         Tamamen dekoratif: aria-hidden. İsim ve tarih ekran okuyucuya kapının
+         karşılama aşamasında ve hero'da zaten okunuyor, tekrarlamıyoruz.
+
+         Animasyon .is-running eklenince başlar — kapı butonuna basıldığı an.
+         Zaman çizelgesi (sn): 0.6 giriş · 4.0 buluşma · 4.2 kalp · 4.4 konfeti
+         · 5.2 yazı.
+
+         Sprite'lar assets/img/ altında. width/height DOSYANIN GERÇEK piksel
+         ölçüsü olmalı (CLS 0 için) — CSS'in beklediği değil.
+
+         >>> BEKLEYEN İŞ: damat sprite'ı ortak grid'e taşınıyor, 68×142 → 49×103.
+         Yeni PNG'ler gelince aşağıdaki iki damat satırında width="68" height="142"
+         → width="49" height="103" yapılacak. CSS (19. bölüm) zaten 49 varsayıyor.
+         Gelin 60×103 olarak kalıyor, ona dokunulmuyor.
+
+         PNG'ler pixel art: optimize/yeniden boyutlandırma/WebP dönüşümü YAPILMAZ.
+         --------------------------------------------------------------------- -->
+    <div class="gate__scene" id="gate-scene" aria-hidden="true">
+      <div class="dugun-davetiye" data-pixel-scene>
+        <div class="gokyuzu"></div>
+        <div class="zemin"></div>
+
+        <!-- loading="lazy" YOK — bilinçli. Dördü tek zamanlı animasyonun
+             kareleri; göz kırpma karesi 4.4s'te opacity 1'e geçiyor ve o an
+             yüklü değilse yüz bir kare kayboluyor. Dördü toplam ~49KB. -->
+        <img class="kisi gelin" alt="" src="assets/img/gelin.png" width="60" height="103" decoding="async">
+        <img class="kisi gelin kirpik" alt="" src="assets/img/gelin-blink.png" width="60" height="103" decoding="async">
+        <img class="kisi damat" alt="" src="assets/img/damat.png" width="68" height="142" decoding="async">
+        <img class="kisi damat kirpik" alt="" src="assets/img/damat-blink.png" width="68" height="142" decoding="async">
+
+        <div class="kalp">
+          <svg viewBox="0 0 11 10" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">
+            <path fill="#d4566b" d="M2 1h3v1h1V1h3v1h1v3h-1v1h-1v1h-1v1H6v1H5V8H4V7H3V6H2V5H1V2h1z"/>
+            <path fill="#f08ba0" d="M2 2h2v1H3v1H2z"/>
+          </svg>
+        </div>
+
+        <div class="konfeti"></div>
+
+        <div class="yazi">
+          <!-- İçerik CONFIG'den: index.html'de hardcode isim/tarih yok.
+               "ve" bileşenin tipografik bağlacı (CONFIG.coupleSeparator "&"
+               burada italik "ve" olarak çiziliyor), o yüzden markup'ta kalıyor. -->
+          <p class="isimler">
+            <span data-text="bride"></span><span class="ve">ve</span><span data-text="groom"></span>
+          </p>
+          <p class="tarih" data-text="dateLabel"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animasyonu atla. Sahne başlayınca görünür olur. -->
+    <button class="gate__skip is-hidden" type="button" id="gate-skip"
+            data-text="text.gateSkip"></button>
   </div>
 
   <!-- ==========================================================================
@@ -175,59 +243,7 @@
     </section>
 
     <!-- ========================================================================
-         3. PİKSEL DAVETİYE SAHNESİ
-         ------------------------------------------------------------------------
-         Kapsüllü bileşen (.dugun-davetiye). Stili style.css 19. bölümde,
-         yıldız/konfeti üretimi app.js setupPixelScene() içinde.
-
-         Sahne tamamen dekoratif: aria-hidden. İsim ve tarih ekran okuyucuya
-         zaten hero + detay bölümlerinde okunuyor, üçüncü kez tekrarlamıyoruz.
-
-         Animasyon viewport'a girince başlar (app.js .is-running ekler) —
-         5.2 saniyelik zaman çizelgesi kullanıcı yukarıdayken akıp bitmesin.
-
-         Sprite'lar assets/img/ altında, width/height gerçek piksel ölçüsü
-         (gelin 60×103, damat 68×142) — CLS 0 kalsın. PNG'ler pixel art:
-         optimize/yeniden boyutlandırma/WebP dönüşümü YAPILMAZ.
-         ======================================================================== -->
-    <section class="section" id="pixel-scene" aria-hidden="true">
-      <div class="section__inner">
-        <div class="dugun-davetiye" data-pixel-scene>
-          <div class="gokyuzu"></div>
-          <div class="zemin"></div>
-
-          <!-- loading="lazy" YOK — bilinçli. Dördü tek zamanlı animasyonun
-               kareleri; göz kırpma karesi 4.4s'te opacity 1'e geçiyor ve o an
-               yüklü değilse yüz bir kare kayboluyor. Dördü toplam ~49KB. -->
-          <img class="kisi gelin" alt="" src="assets/img/gelin.png" width="60" height="103" decoding="async">
-          <img class="kisi gelin kirpik" alt="" src="assets/img/gelin-blink.png" width="60" height="103" decoding="async">
-          <img class="kisi damat" alt="" src="assets/img/damat.png" width="68" height="142" decoding="async">
-          <img class="kisi damat kirpik" alt="" src="assets/img/damat-blink.png" width="68" height="142" decoding="async">
-
-          <div class="kalp">
-            <svg viewBox="0 0 11 10" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-hidden="true">
-              <path fill="#d4566b" d="M2 1h3v1h1V1h3v1h1v3h-1v1h-1v1h-1v1H6v1H5V8H4V7H3V6H2V5H1V2h1z"/>
-              <path fill="#f08ba0" d="M2 2h2v1H3v1H2z"/>
-            </svg>
-          </div>
-
-          <div class="konfeti"></div>
-
-          <div class="yazi">
-            <!-- İçerik CONFIG'den: index.html'de hardcode isim/tarih yok.
-                 "ve" bileşenin tipografik bağlacı (CONFIG.coupleSeparator "&"
-                 burada italik "ve" olarak çiziliyor), o yüzden markup'ta kalıyor. -->
-            <p class="isimler">
-              <span data-text="bride"></span><span class="ve">ve</span><span data-text="groom"></span>
-            </p>
-            <p class="tarih" data-text="dateLabel"></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================================
-         4. ETKİNLİK DETAYI
+         3. ETKİNLİK DETAYI
          ======================================================================== -->
     <section class="section section--alt" id="details" aria-labelledby="details-title">
       <div class="section__inner">
@@ -266,7 +282,7 @@
     </section>
 
     <!-- ========================================================================
-         5. GERİ SAYIM
+         4. GERİ SAYIM
          ======================================================================== -->
     <section class="section section--dark" id="countdown-section" aria-labelledby="countdown-title">
       <div class="particles" data-particles aria-hidden="true"></div>
@@ -300,7 +316,7 @@
     </section>
 
     <!-- ========================================================================
-         6. GALERİ  (CONFIG.options.gallery = false ise app.js kaldırır)
+         5. GALERİ  (CONFIG.options.gallery = false ise app.js kaldırır)
          ======================================================================== -->
     <section class="section" id="gallery" aria-labelledby="gallery-title">
       <div class="section__inner section__inner--wide">
@@ -311,7 +327,7 @@
     </section>
 
     <!-- ========================================================================
-         7. RSVP
+         6. RSVP
          ======================================================================== -->
     <section class="section section--alt" id="rsvp" aria-labelledby="rsvp-title">
       <div class="section__inner">
@@ -410,7 +426,7 @@
     </section>
 
     <!-- ========================================================================
-         8. KONUM
+         7. KONUM
          ======================================================================== -->
     <section class="section" id="location" aria-labelledby="location-title">
       <div class="section__inner section__inner--wide">
@@ -442,7 +458,7 @@
   </main>
 
   <!-- ==========================================================================
-       9. FOOTER
+       8. FOOTER
        ========================================================================== -->
   <footer class="footer">
     <p class="footer__names">

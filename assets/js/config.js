@@ -37,7 +37,7 @@ window.CONFIG = {
   venueCoords: { lat: 41.123456, lng: 29.123456 },
 
   /* ------------------------------------------------------------------- RSVP */
-  rsvpDeadlineISO: "2027-05-29T23:59:59+03:00",
+  rsvpDeadlineISO: "2026-09-12T23:59:59+03:00",
   // Apps Script Web App URL'i. Deploy sonrası aldığın .../exec adresi.
   // Deploy ayarları: Execute as = Me, Who has access = Anyone. (README'ye bak)
   rsvpEndpoint: "https://script.google.com/macros/s/PLACEHOLDER_DEPLOYMENT_ID/exec",
@@ -50,6 +50,8 @@ window.CONFIG = {
     gateKicker: "Düğünümüze davetlisiniz",
     gateButton: "DAVETİYEYİ AÇ",
     gateHint: "Müzik ile birlikte açılır",
+    // Butona basınca oynayan piksel animasyonunu atlama bağlantısı
+    gateSkip: "Atla",
 
     // Davetiye metni bölümü
     inviteTitle: "Davetimiz",
@@ -123,7 +125,7 @@ window.CONFIG = {
 
     // Footer
     footerNote: "Sizi aramızda görmek bizi çok mutlu edecek.",
-    footerCredit: "Ece & İsmail · 2027",
+    footerCredit: "Ece & İsmail · 2026",
 
     // Ses kontrolü (ekran okuyucu etiketleri)
     audioMute: "Müziği kapat",
