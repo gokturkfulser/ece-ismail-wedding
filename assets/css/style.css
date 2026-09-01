@@ -1,0 +1,1108 @@
+/* =============================================================================
+   DÜĞÜN DAVETİYESİ — STİL
+   -----------------------------------------------------------------------------
+   İÇİNDEKİLER
+     01. Fontlar (@font-face)
+     02. Tasarım token'ları (:root)
+     03. Reset & temel tipografi
+     04. Yardımcı sınıflar
+     05. Butonlar & bağlantılar
+     06. Bölüm iskeleti (section / başlık)
+     07. Kapı ekranı (gate)
+     08. Hero + slideshow + Ken Burns
+     09. Ses kontrolü (mute butonu)
+     10. Davetiye metni
+     11. Etkinlik detayı
+     12. Geri sayım
+     13. Galeri
+     14. RSVP formu
+     15. Konum (harita)
+     16. Footer
+     17. Partikül katmanı
+     18. Scroll reveal
+     19. prefers-reduced-motion
+
+   KURAL: Sadece `transform` ve `opacity` animasyonu var.
+   width/height/top/left/filter/box-shadow ANİMASYONU YOK.
+   Tüm renk/spacing/font değerleri :root altındaki custom property'lerde.
+   ============================================================================= */
+
+
+/* =============================================================================
+   01. FONTLAR
+   -----------------------------------------------------------------------------
+   Fontlar repo içinden servis edilir (harici CDN yok).
+   assets/fonts/ boşsa bu @font-face'ler sessizce başarısız olur ve
+   --font-display / --font-body içindeki sistem fontlarına düşülür.
+   Dosyaları nereden indireceğin: assets/fonts/README.txt
+   ============================================================================= */
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("../fonts/cormorant-garamond-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("../fonts/cormorant-garamond-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("../fonts/jost-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("../fonts/jost-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* =============================================================================
+   02. TASARIM TOKEN'LARI
+   -----------------------------------------------------------------------------
+   Tasarım geçişi buradan yapılır. Aşağıdaki bölümlerde çıplak renk/ölçü yok.
+   ============================================================================= */
+
+:root {
+  /* --- Renk: zemin --- */
+  --c-bg:            #f7f5f0;   /* kirli beyaz ana zemin */
+  --c-bg-alt:        #f1eee6;   /* dönüşümlü bölüm zemini */
+  --c-bg-dark:       #1f3d2b;   /* koyu yeşil bloklar */
+  --c-surface:       #fffefb;   /* kart / form yüzeyi */
+
+  /* --- Renk: metin --- */
+  --c-text:          #24261f;
+  --c-text-soft:     #5d6154;
+  --c-text-invert:   #f7f5f0;
+  --c-text-invert-soft: rgba(247, 245, 240, 0.78);
+
+  /* --- Renk: aksan --- */
+  --c-accent:        #1f3d2b;   /* koyu yeşil */
+  --c-accent-hover:  #2e5a3f;
+  --c-accent-soft:   #6e8b72;
+  --c-line:          rgba(36, 38, 31, 0.14);
+  --c-line-invert:   rgba(247, 245, 240, 0.32);
+
+  /* --- Renk: durum --- */
+  --c-error:         #8f2f24;
+  --c-success:       #2f6b45;
+
+  /* --- Renk: overlay (fotoğraf üstü okunabilirlik) --- */
+  --c-scrim:         rgba(20, 30, 22, 0.44);
+  --c-scrim-strong:  rgba(20, 30, 22, 0.62);
+
+  /* --- Tipografi --- */
+  --font-display: "Cormorant Garamond", Cormorant, Georgia, "Times New Roman", serif;
+  --font-body: "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+
+  --fs-xs:   0.75rem;
+  --fs-sm:   0.875rem;
+  --fs-base: 1rem;
+  --fs-md:   1.125rem;
+  --fs-lg:   1.375rem;
+  --fs-xl:   1.75rem;
+  --fs-2xl:  2.25rem;
+  --fs-3xl:  3rem;
+  --fs-4xl:  4rem;
+
+  --lh-tight: 1.15;
+  --lh-snug:  1.35;
+  --lh-base:  1.7;
+
+  --ls-wide:   0.08em;
+  --ls-wider:  0.18em;
+  --ls-widest: 0.3em;
+
+  /* --- Spacing --- */
+  --sp-1:  0.25rem;
+  --sp-2:  0.5rem;
+  --sp-3:  0.75rem;
+  --sp-4:  1rem;
+  --sp-5:  1.5rem;
+  --sp-6:  2rem;
+  --sp-7:  3rem;
+  --sp-8:  4rem;
+  --sp-9:  6rem;
+  --sp-10: 8rem;
+
+  --section-pad-y: var(--sp-8);
+  --section-pad-x: var(--sp-5);
+  --content-w: 40rem;
+  --content-w-wide: 68rem;
+
+  /* --- Şekil --- */
+  --radius-sm: 2px;
+  --radius:    4px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+  --border: 1px solid var(--c-line);
+
+  /* --- Gölge (animasyon YOK, sadece statik) --- */
+  --shadow-sm: 0 1px 2px rgba(36, 38, 31, 0.06);
+  --shadow:    0 4px 20px rgba(36, 38, 31, 0.08);
+
+  /* --- Hareket --- */
+  --dur-fast:   180ms;
+  --dur:        320ms;
+  --dur-slow:   700ms;
+  --dur-gate:   900ms;   /* kapı fade-out */
+  --dur-fade:   1600ms;  /* hero crossfade */
+  --ease:       cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+
+  --kb-scale-from: 1;
+  --kb-scale-to:   1.12;
+
+  /* --- Katman sırası --- */
+  --z-particles: 1;
+  --z-content:   2;
+  --z-audio:     40;
+  --z-gate:      100;
+
+  /* --- Focus --- */
+  --focus-w: 2px;
+  --focus-offset: 3px;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --section-pad-y: var(--sp-10);
+    --section-pad-x: var(--sp-7);
+  }
+}
+
+
+/* =============================================================================
+   03. RESET & TEMEL TİPOGRAFİ
+   ============================================================================= */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Kapı ekranı açık iken sayfa kaydırılamaz */
+body.is-locked { overflow: hidden; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  margin: 0;
+}
+
+p { margin: 0 0 var(--sp-4); }
+p:last-child { margin-bottom: 0; }
+
+img { max-width: 100%; display: block; }
+
+a { color: var(--c-accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--c-accent-hover); }
+
+/* Klavye ile gezinme: her yerde görünür focus */
+:focus-visible {
+  outline: var(--focus-w) solid var(--c-accent);
+  outline-offset: var(--focus-offset);
+}
+.gate :focus-visible,
+.hero :focus-visible,
+.footer :focus-visible {
+  outline-color: var(--c-text-invert);
+}
+
+
+/* =============================================================================
+   04. YARDIMCI SINIFLAR
+   ============================================================================= */
+
+/* Ekran okuyucuya açık, görsel olarak gizli */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Honeypot: ekran dışına konumlandırılmış, klavyeyle erişilemez */
+.honeypot {
+  position: absolute !important;
+  left: -9999px !important;
+  top: auto !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.is-hidden { display: none !important; }
+
+/* JavaScript kapalıysa gösterilen not */
+.noscript-note {
+  padding: var(--sp-7) var(--sp-5);
+  text-align: center;
+  color: var(--c-text-soft);
+}
+
+/* Tam ekran bölümler: 100vh fallback, sonra 100dvh */
+.fullscreen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Fotoğraf üstü okunabilirlik perdesi */
+.scrim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--c-scrim) 0%,
+    rgba(20, 30, 22, 0.28) 45%,
+    var(--c-scrim-strong) 100%
+  );
+  z-index: 1;
+}
+
+
+/* =============================================================================
+   05. BUTONLAR & BAĞLANTILAR
+   ============================================================================= */
+
+.btn {
+  --btn-bg: var(--c-accent);
+  --btn-fg: var(--c-text-invert);
+  --btn-bd: var(--c-accent);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 3rem;
+  padding: var(--sp-3) var(--sp-6);
+  border: 1px solid var(--btn-bd);
+  border-radius: var(--radius-pill);
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+
+.btn:hover { opacity: 0.88; color: var(--btn-fg); }
+.btn:active { transform: scale(0.98); }
+.btn[disabled],
+.btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+.btn[disabled]:active { transform: none; }
+
+/* Çizgili (ikincil) buton */
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-accent);
+  --btn-bd: var(--c-line);
+}
+
+/* Koyu zemin üzerinde */
+.btn--invert {
+  --btn-bg: var(--c-text-invert);
+  --btn-fg: var(--c-accent);
+  --btn-bd: var(--c-text-invert);
+}
+.btn--outline-invert {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-text-invert);
+  --btn-bd: var(--c-line-invert);
+}
+
+.btn--block { width: 100%; }
+
+/* Inline spinner — sadece transform animasyonu */
+.spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+  flex: 0 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Buton grubu */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  justify-content: center;
+}
+.btn-row--stack { flex-direction: column; }
+@media (min-width: 30rem) {
+  .btn-row--stack { flex-direction: row; }
+}
+
+
+/* =============================================================================
+   06. BÖLÜM İSKELETİ
+   ============================================================================= */
+
+.section {
+  position: relative;
+  padding: var(--section-pad-y) var(--section-pad-x);
+}
+.section--alt { background-color: var(--c-bg-alt); }
+.section--dark {
+  background-color: var(--c-bg-dark);
+  color: var(--c-text-invert);
+}
+.section--dark .section__title { color: var(--c-text-invert); }
+.section--dark .section__rule { background-color: var(--c-line-invert); }
+
+.section__inner {
+  position: relative;
+  z-index: var(--z-content);   /* partikül katmanının üstünde kalsın */
+  max-width: var(--content-w);
+  margin: 0 auto;
+}
+.section__inner--wide { max-width: var(--content-w-wide); }
+
+.section__eyebrow {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-widest);
+  text-transform: uppercase;
+  color: var(--c-accent-soft);
+  text-align: center;
+  margin: 0 0 var(--sp-3);
+}
+
+.section__title {
+  font-size: var(--fs-xl);
+  text-align: center;
+  color: var(--c-accent);
+  margin: 0 0 var(--sp-5);
+}
+@media (min-width: 48rem) {
+  .section__title { font-size: var(--fs-2xl); }
+}
+
+/* İnce ayırıcı çizgi */
+.section__rule {
+  width: 3rem;
+  height: 1px;
+  background-color: var(--c-line);
+  margin: 0 auto var(--sp-6);
+  border: 0;
+}
+
+
+/* =============================================================================
+   07. KAPI EKRANI (GATE)
+   -----------------------------------------------------------------------------
+   Tıklandığında JS fade-out yapar ve elementi DOM'dan kaldırır.
+   ============================================================================= */
+
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-gate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--c-bg-dark);
+  color: var(--c-text-invert);
+  opacity: 1;
+  transition: opacity var(--dur-gate) var(--ease);
+}
+
+.gate.is-closing { opacity: 0; pointer-events: none; }
+
+.gate__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.gate__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gate__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: var(--sp-7) var(--sp-5);
+  max-width: 30rem;
+}
+
+.gate__kicker {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-widest);
+  text-transform: uppercase;
+  color: var(--c-text-invert-soft);
+  margin: 0 0 var(--sp-5);
+}
+
+.gate__names {
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-tight);
+  margin: 0 0 var(--sp-4);
+}
+@media (min-width: 48rem) {
+  .gate__names { font-size: var(--fs-4xl); }
+}
+
+.gate__sep {
+  display: block;
+  font-size: 0.5em;
+  color: var(--c-text-invert-soft);
+  margin: var(--sp-2) 0;
+}
+
+.gate__date {
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--c-text-invert-soft);
+  margin: 0 0 var(--sp-7);
+}
+
+.gate__hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text-invert-soft);
+  margin: var(--sp-4) 0 0;
+  letter-spacing: var(--ls-wide);
+}
+
+
+/* =============================================================================
+   08. HERO + SLIDESHOW + KEN BURNS
+   ============================================================================= */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--c-bg-dark);
+  color: var(--c-text-invert);
+}
+
+.hero__slides {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  transition: opacity var(--dur-fade) var(--ease);
+  will-change: opacity;
+}
+.hero__slide.is-active { opacity: 1; }
+
+.hero__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  /* Ken Burns: süre JS tarafından --kb-dur ile slayt başına atanır (20-26s) */
+  animation: ken-burns var(--kb-dur, 22s) ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes ken-burns {
+  from { transform: scale(var(--kb-scale-from)) translate3d(0, 0, 0); }
+  to   { transform: scale(var(--kb-scale-to)) translate3d(var(--kb-x, 0), var(--kb-y, 0), 0); }
+}
+
+.hero__content {
+  position: relative;
+  z-index: var(--z-content);
+  text-align: center;
+  padding: var(--sp-9) var(--sp-5) var(--sp-8);
+  max-width: 34rem;
+}
+
+.hero__names {
+  font-size: var(--fs-3xl);
+  margin: 0 0 var(--sp-4);
+}
+@media (min-width: 48rem) {
+  .hero__names { font-size: var(--fs-4xl); }
+}
+
+.hero__sep {
+  display: block;
+  font-size: 0.5em;
+  color: var(--c-text-invert-soft);
+  margin: var(--sp-2) 0;
+}
+
+.hero__meta {
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--c-text-invert-soft);
+  margin: 0;
+}
+.hero__meta span { display: block; }
+.hero__meta span + span { margin-top: var(--sp-2); }
+
+.hero__venue {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  letter-spacing: var(--ls-wide);
+  text-transform: none;
+  color: var(--c-text-invert);
+}
+
+
+/* =============================================================================
+   09. SES KONTROLÜ
+   ============================================================================= */
+
+.audio-toggle {
+  position: fixed;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  z-index: var(--z-audio);
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--c-line-invert);
+  border-radius: 50%;
+  background-color: var(--c-scrim-strong);
+  color: var(--c-text-invert);
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+.audio-toggle:hover { opacity: 0.82; }
+.audio-toggle:active { transform: scale(0.94); }
+.audio-toggle svg { width: 1.25rem; height: 1.25rem; display: block; }
+
+/* Aynı butonun iki durumu; JS .is-muted sınıfını değiştirir */
+.audio-toggle .icon-muted { display: none; }
+.audio-toggle.is-muted .icon-muted { display: block; }
+.audio-toggle.is-muted .icon-sound { display: none; }
+
+
+/* =============================================================================
+   10. DAVETİYE METNİ
+   ============================================================================= */
+
+.invite__greeting {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: var(--c-accent);
+  text-align: center;
+  margin: 0 0 var(--sp-5);
+}
+
+.invite__body {
+  text-align: center;
+  color: var(--c-text-soft);
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+}
+
+
+/* =============================================================================
+   11. ETKİNLİK DETAYI
+   ============================================================================= */
+
+.details__list {
+  margin: 0 0 var(--sp-7);
+  padding: 0;
+  display: grid;
+  gap: var(--sp-5);
+  text-align: center;
+}
+@media (min-width: 40rem) {
+  .details__list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-4);
+  }
+}
+
+.details__item { margin: 0; }
+
+.details__label {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-widest);
+  text-transform: uppercase;
+  color: var(--c-accent-soft);
+  margin: 0 0 var(--sp-2);
+}
+
+.details__value {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: var(--c-text);
+  margin: 0;
+  line-height: var(--lh-snug);
+}
+
+.details__sub {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+  margin: var(--sp-1) 0 0;
+}
+
+/* Takvim seçenekleri: iki seçenek de sunulur (UA sniffing yok) */
+.calendar-options {
+  margin-top: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: center;
+}
+.calendar-options a {
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+}
+
+
+/* =============================================================================
+   12. GERİ SAYIM
+   ============================================================================= */
+
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-2);
+  max-width: 26rem;
+  margin: 0 auto;
+  list-style: none;
+  padding: 0;
+}
+@media (min-width: 30rem) { .countdown { gap: var(--sp-4); } }
+
+.countdown__cell { text-align: center; }
+
+.countdown__num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: var(--c-text-invert);
+}
+@media (min-width: 48rem) {
+  .countdown__num { font-size: var(--fs-3xl); }
+}
+
+.countdown__label {
+  display: block;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-text-invert-soft);
+}
+
+.countdown-done {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: var(--c-text-invert);
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+
+/* =============================================================================
+   13. GALERİ
+   ============================================================================= */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 48rem) {
+  .gallery {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-4);
+  }
+}
+
+.gallery__item { margin: 0; overflow: hidden; border-radius: var(--radius); }
+
+.gallery__item img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+.gallery__item img:hover { transform: scale(1.04); }
+
+
+/* =============================================================================
+   14. RSVP FORMU
+   ============================================================================= */
+
+.rsvp__intro {
+  text-align: center;
+  color: var(--c-text-soft);
+  margin: 0 0 var(--sp-6);
+}
+
+.form {
+  background-color: var(--c-surface);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-sm);
+}
+@media (min-width: 40rem) { .form { padding: var(--sp-6); } }
+
+.field { margin-bottom: var(--sp-5); }
+.field:last-of-type { margin-bottom: var(--sp-6); }
+
+.field__label {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide);
+  color: var(--c-text);
+  margin-bottom: var(--sp-2);
+}
+
+/* Tarayıcı varsayılan fieldset kenarlığını sıfırla */
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin-inline: 0;
+  min-width: 0;
+}
+
+.field__hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text-soft);
+  margin: var(--sp-2) 0 0;
+}
+.field__hint--inline {
+  display: inline;
+  margin: 0 0 0 var(--sp-2);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.field__error {
+  font-size: var(--fs-xs);
+  color: var(--c-error);
+  margin: var(--sp-2) 0 0;
+  min-height: 1em;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  min-height: 3rem;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-snug);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.input:focus,
+.textarea:focus { border-color: var(--c-accent-soft); }
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"] { border-color: var(--c-error); }
+
+.textarea { min-height: 7rem; resize: vertical; }
+
+/* Katılım durumu: iki radyo, buton gibi görünüyor */
+.choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.choice__option { position: relative; margin: 0; }
+
+/* Gerçek radyo input'u görünmez ama klavyeyle erişilebilir kalır */
+.choice__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.choice__face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background-color: var(--c-bg);
+  color: var(--c-text-soft);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  letter-spacing: var(--ls-wide);
+  text-align: center;
+  transition: opacity var(--dur-fast) var(--ease);
+  pointer-events: none;
+}
+
+.choice__input:checked + .choice__face {
+  border-color: var(--c-accent);
+  background-color: var(--c-accent);
+  color: var(--c-text-invert);
+}
+.choice__input:focus-visible + .choice__face {
+  outline: var(--focus-w) solid var(--c-accent);
+  outline-offset: var(--focus-offset);
+}
+
+/* Sonuç mesajı (aria-live) */
+.form__status {
+  margin-top: var(--sp-4);
+  font-size: var(--fs-sm);
+  text-align: center;
+  min-height: 1.5em;
+}
+.form__status--error { color: var(--c-error); }
+.form__status--success { color: var(--c-success); }
+
+.form__retry { margin-top: var(--sp-3); text-align: center; }
+
+/* Daha önce cevap verildiyse gösterilen blok */
+.rsvp-note {
+  background-color: var(--c-surface);
+  border: var(--border);
+  border-left: 3px solid var(--c-accent-soft);
+  border-radius: var(--radius);
+  padding: var(--sp-5);
+  text-align: center;
+}
+.rsvp-note p { color: var(--c-text-soft); }
+
+/* Son tarih geçtiyse */
+.rsvp-closed {
+  background-color: var(--c-surface);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6) var(--sp-5);
+  text-align: center;
+}
+.rsvp-closed h3 {
+  font-size: var(--fs-lg);
+  color: var(--c-accent);
+  margin: 0 0 var(--sp-3);
+}
+.rsvp-closed p { color: var(--c-text-soft); margin: 0; }
+
+
+/* =============================================================================
+   15. KONUM (HARİTA)
+   ============================================================================= */
+
+.map {
+  position: relative;
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--c-bg-alt);
+  aspect-ratio: 4 / 3;
+  margin-bottom: var(--sp-5);
+}
+@media (min-width: 48rem) { .map { aspect-ratio: 16 / 9; } }
+
+.map iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.location__address {
+  text-align: center;
+  color: var(--c-text-soft);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-5);
+}
+
+
+/* =============================================================================
+   16. FOOTER
+   ============================================================================= */
+
+.footer {
+  background-color: var(--c-bg-dark);
+  color: var(--c-text-invert);
+  text-align: center;
+  padding: var(--sp-8) var(--section-pad-x);
+}
+
+.footer__names {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  margin: 0 0 var(--sp-4);
+}
+
+.footer__note {
+  color: var(--c-text-invert-soft);
+  max-width: 28rem;
+  margin: 0 auto var(--sp-5);
+}
+
+.footer__credit {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--c-text-invert-soft);
+  margin: 0;
+}
+
+
+/* =============================================================================
+   17. PARTİKÜL KATMANI
+   -----------------------------------------------------------------------------
+   En fazla 12 element. Süre/gecikme/x-sapması JS'te rastgele atanır,
+   negatif animation-delay ile sayfa açılışında dağılmış başlarlar.
+   ============================================================================= */
+
+.particles {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-particles);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  bottom: -2rem;
+  width: var(--p-size, 6px);
+  height: var(--p-size, 6px);
+  border-radius: 50%;
+  background-color: var(--c-text-invert);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: drift var(--p-dur, 18s) linear var(--p-delay, 0s) infinite;
+}
+
+@keyframes drift {
+  0%   { transform: translate3d(0, 0, 0) scale(0.6); opacity: 0; }
+  12%  { opacity: var(--p-opacity, 0.5); }
+  85%  { opacity: var(--p-opacity, 0.5); }
+  100% { transform: translate3d(var(--p-x, 2rem), calc(-1 * var(--p-rise, 60vh)), 0) scale(1); opacity: 0; }
+}
+
+
+/* =============================================================================
+   18. SCROLL REVEAL
+   -----------------------------------------------------------------------------
+   IntersectionObserver `data-reveal` elemanlarına .is-visible ekler,
+   sonra gözlemden çıkarır (tek seferlik).
+   ============================================================================= */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* JS çalışmazsa içerik gizli kalmasın */
+.no-js [data-reveal] { opacity: 1; transform: none; }
+
+
+/* =============================================================================
+   19. prefers-reduced-motion
+   -----------------------------------------------------------------------------
+   Ken Burns, partiküller ve reveal animasyonları kapatılır.
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .hero__slide img { animation: none; transform: none; }
+
+  .particles { display: none; }
+  .particle { animation: none; opacity: 0; }
+
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+
+  .gallery__item img { transition: none; }
+  .gallery__item img:hover { transform: none; }
+
+  .btn:active,
+  .audio-toggle:active { transform: none; }
+
+  /* Crossfade ve kapı geçişi kalır ama çok kısaltılır */
+  .hero__slide { transition-duration: 200ms; }
+  .gate { transition-duration: 200ms; }
+
+  .spinner { animation-duration: 2s; }
+}

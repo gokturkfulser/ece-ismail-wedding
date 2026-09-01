@@ -1,1 +1,407 @@
-'aaa'
+<!DOCTYPE html>
+<html lang="tr" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- ==========================================================================
+       META / SOSYAL MEDYA KARTI
+       --------------------------------------------------------------------------
+       DİKKAT: Build step olmadığı için aşağıdaki değerler HTML'de STATİK kalır.
+       CONFIG'i düzenledikten sonra bu blogu da ELLE güncelle.
+       "CONFIG İLE EŞLE" yorumu olan her satır assets/js/config.js ile eşleşmeli.
+
+       og:image ve og:url MUTLAKA tam (absolute) URL olmalı — WhatsApp ve Twitter
+       scraper'ları göreli yolu okumaz. Sitenin gerçek adresini yaz.
+       ========================================================================== -->
+
+  <!-- CONFIG İLE EŞLE: bride + coupleSeparator + groom, dateLabel -->
+  <title>Ece &amp; İsmail · 12 Haziran 2027</title>
+  <!-- CONFIG İLE EŞLE: text.inviteBody[0] özeti -->
+  <meta name="description" content="Ece ve İsmail'in düğün davetiyesi. 12 Haziran 2027, Örnek Kır Bahçesi. Katılım bildirimi için tıklayın.">
+
+  <!-- CONFIG İLE EŞLE: --c-bg-dark (assets/css/style.css) -->
+  <meta name="theme-color" content="#1f3d2b">
+  <meta name="color-scheme" content="light">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="tr_TR">
+  <!-- CONFIG İLE EŞLE -->
+  <meta property="og:site_name" content="Ece &amp; İsmail">
+  <meta property="og:title" content="Ece &amp; İsmail · Düğün Davetiyesi">
+  <meta property="og:description" content="12 Haziran 2027, Cumartesi · 18:30 · Örnek Kır Bahçesi. Katılım bildirimi için davetiyeyi açın.">
+  <!-- TAM URL GEREKLİ — kendi Pages adresinle değiştir -->
+  <meta property="og:url" content="https://KULLANICI.github.io/DEPO/">
+  <meta property="og:image" content="https://KULLANICI.github.io/DEPO/assets/img/og.png">
+  <meta property="og:image:secure_url" content="https://KULLANICI.github.io/DEPO/assets/img/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Ece ve İsmail düğün davetiyesi">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- CONFIG İLE EŞLE -->
+  <meta name="twitter:title" content="Ece &amp; İsmail · Düğün Davetiyesi">
+  <meta name="twitter:description" content="12 Haziran 2027, Cumartesi · 18:30 · Örnek Kır Bahçesi.">
+  <meta name="twitter:image" content="https://KULLANICI.github.io/DEPO/assets/img/og.png">
+  <meta name="twitter:image:alt" content="Ece ve İsmail düğün davetiyesi">
+
+  <!-- Favicon — tüm yollar GÖRELİ (alt path'te çalışması için) -->
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- CONFIG: sitenin tek içerik kaynağı. <head> içinde çünkü aşağıdaki
+       preload script'i buna ihtiyaç duyuyor (LCP görselini erken başlatmak için). -->
+  <script src="assets/js/config.js"></script>
+  <script>
+    /* Kapı ekranı görseli LCP elemanı. app.js body sonunda çalıştığı için
+       indirmeyi burada preload ile başlatıyoruz — yol yine CONFIG'den geliyor,
+       ikinci bir hardcode yok. */
+    (function () {
+      var gate = window.CONFIG && window.CONFIG.gate;
+      if (!gate) return;
+      var mobile = window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
+      var href = mobile ? gate.portrait : gate.landscape;
+      if (!href) return;
+      var link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = href;
+      link.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(link);
+    })();
+  </script>
+</head>
+
+<body>
+
+  <noscript>
+    <p class="noscript-note">
+      Davetiyeyi görüntülemek için tarayıcınızda JavaScript'i etkinleştirmeniz gerekiyor.
+    </p>
+  </noscript>
+
+  <!-- ==========================================================================
+       KAPI EKRANI
+       --------------------------------------------------------------------------
+       Tam ekran. Butona basılınca app.js müziği başlatır, kapıyı fade-out yapar
+       ve elementi DOM'dan kaldırır.
+       ========================================================================== -->
+  <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-names">
+    <div class="gate__media scrim" id="gate-media"><!-- CONFIG.gate → app.js --></div>
+
+    <div class="gate__content">
+      <p class="gate__kicker" data-text="text.gateKicker"></p>
+
+      <h1 class="gate__names" id="gate-names">
+        <span data-text="bride"></span>
+        <span class="gate__sep" aria-hidden="true" data-text="coupleSeparator"></span>
+        <span data-text="groom"></span>
+      </h1>
+
+      <p class="gate__date" data-text="dateLabel"></p>
+
+      <button class="btn btn--invert" type="button" id="gate-open" data-text="text.gateButton"></button>
+
+      <p class="gate__hint" id="gate-hint" data-text="text.gateHint"></p>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       SES KONTROLÜ
+       --------------------------------------------------------------------------
+       Müzik başarıyla çalmaya başlayana kadar gizli. Durum localStorage'da.
+       ========================================================================== -->
+  <button class="audio-toggle is-hidden is-muted" type="button" id="audio-toggle"
+          aria-pressed="true" aria-label="Müziği aç">
+    <svg class="icon-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9v6h3l5 4V5L7 9H4z"></path>
+      <path d="M16 8.5a4.5 4.5 0 0 1 0 7"></path>
+      <path d="M18.5 5.5a8 8 0 0 1 0 13"></path>
+    </svg>
+    <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9v6h3l5 4V5L7 9H4z"></path>
+      <path d="M16 9.5l5 5"></path>
+      <path d="M21 9.5l-5 5"></path>
+    </svg>
+  </button>
+
+  <!-- ==========================================================================
+       1. HERO — slideshow + Ken Burns
+       ========================================================================== -->
+  <header class="hero fullscreen" id="hero">
+    <div class="hero__slides scrim" id="hero-slides"><!-- CONFIG.hero → app.js --></div>
+
+    <!-- Dekoratif partikül katmanı (CONFIG.options.particles = false ile kapanır) -->
+    <div class="particles" data-particles aria-hidden="true"></div>
+
+    <div class="hero__content">
+      <h2 class="hero__names" id="hero-title" tabindex="-1">
+        <span data-text="bride"></span>
+        <span class="hero__sep" aria-hidden="true" data-text="coupleSeparator"></span>
+        <span data-text="groom"></span>
+      </h2>
+
+      <p class="hero__meta">
+        <span data-text="dateLabel"></span>
+        <span data-text="timeLabel"></span>
+        <span class="hero__venue" data-text="venueName"></span>
+      </p>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ========================================================================
+         2. DAVETİYE METNİ
+         ======================================================================== -->
+    <section class="section" id="invite" aria-labelledby="invite-title">
+      <div class="section__inner">
+        <h2 class="section__title" id="invite-title" data-text="text.inviteTitle" data-reveal></h2>
+        <hr class="section__rule">
+
+        <!-- ?d= parametresi yoksa app.js bu bloğu tamamen kaldırır -->
+        <p class="invite__greeting" id="greeting" data-reveal></p>
+
+        <div class="invite__body" data-text-list="text.inviteBody" data-reveal></div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         3. ETKİNLİK DETAYI
+         ======================================================================== -->
+    <section class="section section--alt" id="details" aria-labelledby="details-title">
+      <div class="section__inner">
+        <h2 class="section__title" id="details-title" data-text="text.detailsTitle" data-reveal></h2>
+        <hr class="section__rule">
+
+        <dl class="details__list" data-reveal>
+          <div class="details__item">
+            <dt class="details__label" data-text="text.detailsDateLabel"></dt>
+            <dd class="details__value" data-text="dateLabel"></dd>
+          </div>
+          <div class="details__item">
+            <dt class="details__label" data-text="text.detailsTimeLabel"></dt>
+            <dd class="details__value" data-text="timeLabel"></dd>
+          </div>
+          <div class="details__item">
+            <dt class="details__label" data-text="text.detailsVenueLabel"></dt>
+            <dd class="details__value">
+              <span data-text="venueName"></span>
+              <span class="details__sub" data-text="venueAddress"></span>
+            </dd>
+          </div>
+        </dl>
+
+        <div class="btn-row btn-row--stack" data-reveal>
+          <!-- Takvime Ekle: iki seçenek birlikte sunulur, UA sniffing yok -->
+          <a class="btn" id="cal-google" href="#" target="_blank" rel="noopener"
+             data-text="text.calendarGoogle"></a>
+          <!-- invite.ics repo kökünde statik dosya (README'deki senkron notuna bak) -->
+          <a class="btn btn--ghost" id="cal-ics" href="invite.ics" download
+             data-text="text.calendarIcs"></a>
+          <a class="btn btn--ghost" id="directions" href="#" target="_blank" rel="noopener"
+             data-text="text.directionsButton"></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         4. GERİ SAYIM
+         ======================================================================== -->
+    <section class="section section--dark" id="countdown-section" aria-labelledby="countdown-title">
+      <div class="particles" data-particles aria-hidden="true"></div>
+
+      <div class="section__inner">
+        <h2 class="section__title" id="countdown-title" data-text="text.countdownTitle" data-reveal></h2>
+        <hr class="section__rule">
+
+        <ul class="countdown" id="countdown" data-reveal>
+          <li class="countdown__cell">
+            <span class="countdown__num" id="cd-days">00</span>
+            <span class="countdown__label" data-text="text.countdownDays"></span>
+          </li>
+          <li class="countdown__cell">
+            <span class="countdown__num" id="cd-hours">00</span>
+            <span class="countdown__label" data-text="text.countdownHours"></span>
+          </li>
+          <li class="countdown__cell">
+            <span class="countdown__num" id="cd-minutes">00</span>
+            <span class="countdown__label" data-text="text.countdownMinutes"></span>
+          </li>
+          <li class="countdown__cell">
+            <span class="countdown__num" id="cd-seconds">00</span>
+            <span class="countdown__label" data-text="text.countdownSeconds"></span>
+          </li>
+        </ul>
+
+        <!-- Tarih geçtiyse app.js listeyi gizler, bunu gösterir -->
+        <p class="countdown-done is-hidden" id="countdown-done" data-text="text.countdownDone"></p>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         5. GALERİ  (CONFIG.options.gallery = false ise app.js kaldırır)
+         ======================================================================== -->
+    <section class="section" id="gallery" aria-labelledby="gallery-title">
+      <div class="section__inner section__inner--wide">
+        <h2 class="section__title" id="gallery-title" data-text="text.galleryTitle" data-reveal></h2>
+        <hr class="section__rule">
+        <ul class="gallery" id="gallery-list" data-reveal><!-- CONFIG.gallery → app.js --></ul>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         6. RSVP
+         ======================================================================== -->
+    <section class="section section--alt" id="rsvp" aria-labelledby="rsvp-title">
+      <div class="section__inner">
+        <h2 class="section__title" id="rsvp-title" data-text="text.rsvpTitle" data-reveal></h2>
+        <hr class="section__rule">
+        <p class="rsvp__intro" data-text="text.rsvpIntro" data-reveal></p>
+
+        <!-- Son tarih geçtiyse app.js formu kaldırır ve bunu gösterir -->
+        <div class="rsvp-closed is-hidden" id="rsvp-closed" data-reveal>
+          <h3 data-text="text.rsvpClosedTitle"></h3>
+          <p data-text="text.rsvpClosedText"></p>
+        </div>
+
+        <!-- Daha önce cevap verildiyse gösterilir; form kapalı gelir -->
+        <div class="rsvp-note is-hidden" id="rsvp-note" data-reveal>
+          <p data-text="text.rsvpAlreadyText"></p>
+          <button class="btn btn--ghost" type="button" id="rsvp-reopen"
+                  data-text="text.rsvpAlreadyButton"></button>
+        </div>
+
+        <form class="form" id="rsvp-form" novalidate data-reveal>
+
+          <!-- Katılım durumu -->
+          <fieldset class="field fieldset">
+            <legend class="field__label" data-text="text.rsvpAttendingLabel"></legend>
+
+            <div class="choice">
+              <label class="choice__option">
+                <input class="choice__input" type="radio" name="attending" value="yes" required>
+                <span class="choice__face" data-text="text.rsvpYes"></span>
+              </label>
+              <label class="choice__option">
+                <input class="choice__input" type="radio" name="attending" value="no" required>
+                <span class="choice__face" data-text="text.rsvpNo"></span>
+              </label>
+            </div>
+
+            <p class="field__error" id="err-attending" role="alert"></p>
+          </fieldset>
+
+          <!-- Ad Soyad -->
+          <div class="field">
+            <label class="field__label" for="rsvp-name" data-text="text.rsvpNameLabel"></label>
+            <input class="input" type="text" id="rsvp-name" name="name"
+                   autocomplete="name" enterkeyhint="next" required
+                   maxlength="80"
+                   data-attr="placeholder:text.rsvpNamePlaceholder">
+            <p class="field__error" id="err-name" role="alert"></p>
+          </div>
+
+          <!-- Kişi sayısı -->
+          <div class="field">
+            <label class="field__label" for="rsvp-guests" data-text="text.rsvpGuestsLabel"></label>
+            <input class="input" type="number" id="rsvp-guests" name="guests"
+                   inputmode="numeric" min="1" max="10" step="1" value="1" required>
+            <p class="field__hint" data-text="text.rsvpGuestsHint"></p>
+            <p class="field__error" id="err-guests" role="alert"></p>
+          </div>
+
+          <!-- Mesaj -->
+          <div class="field">
+            <label class="field__label" for="rsvp-message">
+              <span data-text="text.rsvpMessageLabel"></span>
+              <span class="field__hint field__hint--inline" data-text="text.rsvpMessageHint"></span>
+            </label>
+            <textarea class="textarea" id="rsvp-message" name="message" maxlength="500"
+                      data-attr="placeholder:text.rsvpMessagePlaceholder"></textarea>
+            <p class="field__hint" id="rsvp-message-count" aria-hidden="true"></p>
+          </div>
+
+          <!-- ============================ HONEYPOT ============================
+               Bot tuzağı. Ekran dışında, klavyeyle erişilemez, otomatik
+               doldurma kapalı. Dolu gelirse app.js sessizce başarılı gibi
+               davranır ve HİÇBİR ŞEY GÖNDERMEZ. CAPTCHA yok.
+               ================================================================= -->
+          <div class="honeypot" aria-hidden="true">
+            <label for="rsvp-website">Website</label>
+            <input type="text" id="rsvp-website" name="website"
+                   tabindex="-1" autocomplete="off">
+          </div>
+
+          <button class="btn btn--block" type="submit" id="rsvp-submit">
+            <span class="spinner is-hidden" id="rsvp-spinner" aria-hidden="true"></span>
+            <span id="rsvp-submit-label" data-text="text.rsvpSubmit"></span>
+          </button>
+
+          <!-- Sonuç mesajı -->
+          <p class="form__status" id="rsvp-status" role="status" aria-live="polite"></p>
+
+          <div class="form__retry is-hidden" id="rsvp-retry">
+            <button class="btn btn--ghost" type="button" id="rsvp-retry-btn"
+                    data-text="text.rsvpRetry"></button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         7. KONUM
+         ======================================================================== -->
+    <section class="section" id="location" aria-labelledby="location-title">
+      <div class="section__inner section__inner--wide">
+        <h2 class="section__title" id="location-title" data-text="text.locationTitle" data-reveal></h2>
+        <hr class="section__rule">
+
+        <p class="location__address">
+          <strong data-text="venueName"></strong><br>
+          <span data-text="venueAddress"></span>
+        </p>
+
+        <!-- API key gerektirmeyen embed formu; src app.js tarafından atanır -->
+        <div class="map" data-reveal>
+          <iframe id="map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                  allowfullscreen data-attr="title:text.mapEmbedTitle"></iframe>
+        </div>
+
+        <div class="btn-row" data-reveal>
+          <a class="btn btn--ghost" id="map-google" href="#" target="_blank" rel="noopener"
+             data-text="text.mapGoogle"></a>
+          <a class="btn btn--ghost" id="map-apple" href="#" target="_blank" rel="noopener"
+             data-text="text.mapApple"></a>
+          <a class="btn btn--ghost" id="map-yandex" href="#" target="_blank" rel="noopener"
+             data-text="text.mapYandex"></a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       8. FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <p class="footer__names">
+      <span data-text="bride"></span>
+      <span aria-hidden="true" data-text="coupleSeparator"></span>
+      <span data-text="groom"></span>
+    </p>
+    <p class="footer__note" data-text="text.footerNote"></p>
+    <p class="footer__credit" data-text="text.footerCredit"></p>
+  </footer>
+
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
