@@ -19,22 +19,22 @@ window.CONFIG = {
 
   /* ----------------------------------------------------------- Tarih & saat */
   // Kaynak tarih. Geri sayım, takvim linki ve RSVP mantığı bunu kullanır.
-  dateISO: "2026-09-26T18:30:00+03:00",
+  dateISO: "2026-09-26T12:00:00+03:00",
   // Takvim kaydının bitişi (Google Calendar + invite.ics için gerekli).
-  endISO: "2026-09-26T23:30:00+03:00",
+  endISO: "2026-09-26T16:00:00+03:00",
 
   // Ekranda görünen serbest metinler. Bilinçli olarak elle yazılıyor:
   // WhatsApp içi eski WebView'larda toLocaleDateString('tr-TR') tutarsız.
   dateLabel: "26 Eylül 2026 · Cumartesi",
-  timeLabel: "18:30",
+  timeLabel: "12:00 – 16:00",
 
   /* ------------------------------------------------------------------ Mekân */
-  venueName: "Örnek Kır Bahçesi",
-  venueAddress: "Örnek Mah. Örnek Cad. No: 1, Beykoz / İstanbul",
+  venueName: "Park Lamore",
+  venueAddress: "İncek, Turgut Özal Blv. No:48, 06830 Gölbaşı/Ankara",
   // Haritaya gömülü iframe ve Google/Apple linkleri bu sorgudan kurulur.
-  mapsQuery: "Örnek Kır Bahçesi, Beykoz, İstanbul",
+  mapsQuery: "Park Lamore, İncek, Turgut Özal Blv. No:48, 06830 Gölbaşı/Ankara",
   // Apple Maps ve Yandex rota linkleri koordinatla çok daha güvenilir çalışır.
-  venueCoords: { lat: 41.123456, lng: 29.123456 },
+  venueCoords: { lat: 39.797014, lng: 32.693879 },
 
   /* ------------------------------------------------------------------- RSVP */
   rsvpDeadlineISO: "2026-09-12T23:59:59+03:00",

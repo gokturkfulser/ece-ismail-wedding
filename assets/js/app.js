@@ -251,12 +251,12 @@
 
   function renderPhoto() {
     var section = $('#photo');
-    var figure = $('#photo-figure');
-    if (!section || !figure) return;
+    var media = $('#photo-figure');
+    if (!section || !media) return;
 
     if (!C.photo) { section.remove(); return; }
 
-    figure.appendChild(buildPicture(C.photo));
+    media.appendChild(buildPicture(C.photo));
   }
 
 

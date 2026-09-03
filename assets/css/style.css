@@ -648,7 +648,7 @@ a:hover { color: var(--c-accent-hover); }
 .hero {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   overflow: hidden;
   background-color: var(--c-bg-dark);
@@ -920,27 +920,55 @@ a:hover { color: var(--c-accent-hover); }
 /* =============================================================================
    13. FOTOĞRAF
    -----------------------------------------------------------------------------
-   Hero'nun hemen altında, sayfanın üst bölgesinde tek görsel (CONFIG.photo).
+   Hero'nun hemen altında tek görsel banner (CONFIG.photo): fotoğraf tam
+   genişlik arka planda, isimler ortada üstüne biniyor — hero ile aynı
+   media+scrim+content deseni, sadece slaytsız ve daha kısa.
    ============================================================================= */
 
-.photo { padding-top: 0; }
-
-.photo__figure {
-  margin: 0 auto;
-  max-width: 34rem;
+.photo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  border-radius: var(--radius);
+  min-height: 60svh;
+  background-color: var(--c-bg-dark);
+  color: var(--c-text-invert);
 }
 
-.photo__figure img {
+.photo__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.photo__media img {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 5;
+  height: 100%;
   object-fit: cover;
 }
+
+.photo__content {
+  position: relative;
+  z-index: var(--z-content);
+  text-align: center;
+  padding: var(--sp-8) var(--sp-5);
+}
+
+.photo__names {
+  font-size: var(--fs-2xl);
+  margin: 0;
+}
 @media (min-width: 48rem) {
-  .photo__figure img { aspect-ratio: 3 / 2; }
+  .photo__names { font-size: var(--fs-3xl); }
+}
+
+.photo__sep {
+  display: block;
+  font-size: 0.5em;
+  color: var(--c-text-invert-soft);
+  margin: var(--sp-2) 0;
 }
 
 
