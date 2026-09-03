@@ -3,11 +3,11 @@
 ## İçerik
 - `davetiye.html` — referans uygulama. Yorum satırlarıyla işaretli bölüm siteye taşınacak.
 - `davetiye.css` — bileşenin tüm stili. Her kural `.dugun-davetiye` altında kapsüllü.
-- `img/gelin.png` (60×103), `img/damat.png` (68×142) — ana sprite'lar
+- `img/gelin.png` (69×114), `img/damat.png` (68×142) — ana sprite'lar
 - `img/gelin-blink.png`, `img/damat-blink.png` — göz kapalı kareler, aynı boyut
 
 ## Bozulmaması gereken üç şey
-1. **Ölçek oranı 11:8.** Gelin `60 * --unit`, damat `68 * --unit * 0.727`.
+1. **Ölçek oranı 5:4.** Gelin `69 * --unit`, damat `68 * --unit * 0.8`.
    İkisi farklı çözünürlükte çizildi; bu çarpan boylarını eşitliyor.
    Tek ölçek kolu `--unit`, sadece onu değiştir.
 2. **`image-rendering: pixelated`.** Kalkarsa tarayıcı pikselleri yumuşatır,

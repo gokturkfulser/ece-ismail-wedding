@@ -575,18 +575,22 @@ a:hover { color: var(--c-accent-hover); }
   --yazi-alt: 3%;
 }
 
-/* Kapıda dikey bütçe: üst metin bloğu (~420px) + karakter boyu + alt yazı
-   (~90px). --unit 3px'te karakter 309px, toplam ~819px eder; bundan kısa
-   viewport'ta buton karakterlerin başına biniyordu.
+/* Kapıda dikey bütçe: üst metin bloğu (~470px) + karakter boyu + alt yazı
+   (~90px). --unit 3px'te karakter 114*3 = 342px, toplam ~900px eder; bundan
+   kısa viewport'ta buton karakterlerin başına biniyordu.
    Değerler TAM SAYI px kalıyor (piksel hizası, bkz. bölüm başlığı). */
 @media (max-height: 58rem) {
-  .gate__scene .dugun-davetiye { --unit: 2px; }   /* karakter 206px */
+  .gate__scene .dugun-davetiye { --unit: 2px; }   /* karakter 114*2 = 228px */
 }
-@media (max-height: 40rem) {
-  /* Yatay çevrilmiş telefon: metnin kendisi de küçülmeli */
-  .gate__names { font-size: var(--fs-2xl); }
-  .gate__date { margin-bottom: var(--sp-5); }
+/* Kısa ekran: karakter 228px + alt yazı ~60px yer istiyor, artan yer metne
+   kalıyor. Metin bloğunu küçültmezsek buton karakterlerin başına biniyor
+   (360x640'ta ölçülen çakışma: -3px). */
+@media (max-height: 44rem) {
+  .gate__names { font-size: var(--fs-xl); }
   .gate__kicker { margin-bottom: var(--sp-3); }
+  .gate__date { margin-bottom: var(--sp-4); }
+  .gate__hint { margin-top: var(--sp-2); }
+  .gate__sep { margin: var(--sp-1) 0; }
 }
 
 /* Çok kısa viewport (yatay telefon): 390px yüksekliğe ~324px metin bloğu +
@@ -1209,28 +1213,19 @@ a:hover { color: var(--c-accent-hover); }
    Kapsüllü bileşen: her kural `.dugun-davetiye` altında. Global'e taşımayın —
    sahnenin kendi renk/ölçek token'ları var ve site token'larıyla çakışmamalı.
 
-   ÖLÇEK: ORTAK GRID — `--unit` TEK KOL, ÇARPAN YOK
+   ÖLÇEK: 5:4 ORANI (paket/OKU.md)
    -----------------------------------------------------------------------------
-   Gelin `60 * --unit`, damat `49 * --unit`. İki sprite da 103 piksel yüksek,
-   yani aynı piksel yoğunluğunda çizilmiş; `--unit` ikisini de aynı TAM SAYI
-   katta büyütüyor ve boyları kendiliğinden eşit çıkıyor.
+   Gelin `69 * --unit`, damat `68 * --unit * 0.8`. İki sprite farklı
+   çözünürlükte çizildi; 0.8 (= 4/5) çarpanı boylarını eşitliyor:
+   gelin 114 birim boy, damat 142 -> 114*5 = 570 ile 142*4 = 568.
+   Tek ölçek kolu `--unit`, sadece onu değiştir.
 
-   Eski 11:8 / 0.727 çarpanı BİLİNÇLİ OLARAK KALDIRILDI (paket/OKU.md onu
-   korumayı söylüyor, gerekçesiyle birlikte iptal edildi):
-
-     0.727 = 8/11. Doğru çalışması için `--unit`in 11'in katı olması gerekir;
-     referans paket ise `--unit: 4px` ile geliyor. 4, 11'in katı olmadığı için
-     damat 2.908x ile ölçekleniyordu ve `pixelated` altında 68 kaynak
-     sütunundan 62'si ekranda 3px, 6'sı 2px genişliğinde çiziliyordu — piksel
-     gridi düzensizdi. Gelin tam 4.000x olduğu için temiz görünüyordu; yan yana
-     bakıldığında ikisi farklı ölçekten gelmiş gibi duruyordu.
-
-     11:8'i tam sayı tutan en küçük ölçek gelin 660x1133 / damat 544x1136.
-     Karakterler zemin çizgisinin üstünde durduğu için bu ~1490px yüksek bir
-     panel ister; hiçbir gerçek ekrana sığmıyor, k=1 altında ara değer de yok.
-
-     Çözüm çarpanı ayarlamak değil, damadı gelinin yoğunluğunda yeniden
-     çizmekti (68x142 -> 49x103). Böylece oran hack'ine hiç gerek kalmıyor.
+   Tam sayı ölçek notu: ikisinin de tam sayı katta büyümesi için `--unit`in
+   5'in katı olması gerekir (o zaman gelin 5x, damat 4x). Sahnenin dikey
+   bütçesi `--unit: 5px`te karakteri 570px yapıyor ve kapı metniyle
+   çakışıyor, bu yüzden 3px/2px kullanılıyor: gelin tam sayı (3.000x /
+   2.000x), damat ondalık (2.400x / 1.600x) kalıyor. Damadın piksel gridi
+   bu yüzden gelinden bir tık daha düzensiz.
 
    DOKUNULMAYACAKLAR:
      1) `image-rendering: pixelated` — kalkarsa tarayıcı pikselleri yumuşatır.
@@ -1249,11 +1244,6 @@ a:hover { color: var(--c-accent-hover); }
    bekler — kapı butonuna basılana kadar çizelge akmasın. Sahne kapı ekranının
    2. aşamasında yaşıyor (07. bölüm, `.gate__scene`).
 
-   >>> BEKLEYEN İŞ: assets/img/damat.png ve damat-blink.png hâlâ ESKİ 68x142
-   sprite'lar. CSS yukarıda 49x103 varsayıyor; yeni sprite gelene kadar damat
-   2.882x ile ölçeklenmeye devam eder (eski haliyle aynı, daha kötü değil).
-   Yeni PNG'ler düşünce yapılacak tek şey: index.html'deki dört `width`/`height`
-   özniteliğinden damadın ikisini 49/103 yapmak. CSS'te değişiklik gerekmiyor.
    ============================================================================= */
 
 .dugun-davetiye {
@@ -1272,12 +1262,12 @@ a:hover { color: var(--c-accent-hover); }
      tıklanınca 0'a yürüyorlar. `--unit` katı olması şart (piksel hizası). */
   --ayrik: calc(22 * var(--unit));
 
-  /* Duruş anında gövde araligi. ELLERİ BULUŞTURAN DEĞER — deneysel:
-     gelinin içteki eli kendi tuval kenarından 8 kaynak piksel içeride,
-     damadın 2 piksel. İkisi merkeze doğru 5 birim kayınca eller
-     zeminden 95-113px bandında çakışıyor ve el ele tutuşmuş görünüyorlar.
-     Gövdeler çarpışmıyor: en dar nokta zaten ellerin bulunduğu yer. */
-  --ic-ofset: calc(5 * var(--unit));
+  /* Duruş anında gövde aralığı. ELLERİ BULUŞTURAN DEĞER — ölçümle bulundu:
+     gelinin içteki eli kendi tuval kenarından 2 kaynak piksel, damadın da
+     2 piksel içeride. Ölçekler farklı olduğu için ekranda 6.0px ve 4.8px
+     eder; eller değsin diye ikisi merkeze doğru 2 birim kayıyor.
+     69x114 sprite'a göre yeniden ayarlandı (eski 60x103'te 5 birimdi). */
+  --ic-ofset: calc(2 * var(--unit));
 
   /* Zemin cizgisinin alttan yuksekligi. Kapida tam ekran oldugu icin
      asagi cekiliyor (bkz. .gate__scene .dugun-davetiye) - metin gokyuzunde,
@@ -1321,9 +1311,9 @@ a:hover { color: var(--c-accent-hover); }
   height: 2px; background: rgba(36, 31, 51, .35);
 }
 
-/* karakterler — ortak grid: ikisi de `N * --unit`, çarpan yok.
-   N = sprite'ın kaynak genişliği (gelin 60, damat 49). Boyları eşit çıkıyor
-   çünkü iki sprite da 103 piksel yüksek. Bölüm başlığındaki ÖLÇEK notuna bak. */
+/* karakterler — 5:4 oranı burada kilitli, bozma.
+   Gelin 69 birim geniş (kaynak 69x114), damat 68 birim * 0.8 (kaynak 68x142).
+   Bölüm başlığındaki ÖLÇEK notuna bak. */
 .dugun-davetiye .kisi {
   position: absolute; bottom: var(--zemin);
   /* `height: auto` ŞART. <img>'deki height="103"/height="142" öznitelikleri
@@ -1335,13 +1325,13 @@ a:hover { color: var(--c-accent-hover); }
   image-rendering: pixelated;
 }
 .dugun-davetiye .gelin {
-  width: calc(60 * var(--unit));
-  left: 50%; margin-left: calc(-60 * var(--unit) + var(--ic-ofset));
+  width: calc(69 * var(--unit));
+  left: 50%; margin-left: calc(-69 * var(--unit) + var(--ic-ofset));
   animation: dd-gel-sol 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .6s 7;
 }
 .dugun-davetiye .damat {
-  width: calc(49 * var(--unit));
+  width: calc(68 * var(--unit) * 0.8);
   left: 50%; margin-left: calc(-1 * var(--ic-ofset));
   animation: dd-gel-sag 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .75s 7;
@@ -1378,10 +1368,10 @@ a:hover { color: var(--c-accent-hover); }
    boyuna kavuşunca 58% gelinin omzuna bindi. Sabit yüzde de çözmüyor: panel
    yüksekliği vh ile, karakter `--unit` ile ölçeklendiği için ikisinin oranı
    her ekranda değişiyor ve küçük ekranda kalp yine başlara biniyordu.
-   Formül: zemin (24%) + karakter boyu (103 * --unit) + 4 birim boşluk. */
+   Formül: zemin + karakter boyu (114 * --unit) + 4 birim boşluk. */
 .dugun-davetiye .kalp {
   position: absolute; left: 50%; opacity: 0;
-  bottom: calc(var(--zemin) + 107 * var(--unit));
+  bottom: calc(var(--zemin) + 118 * var(--unit));
   translate: -50% 0;
   animation: dd-kalp-cik .7s steps(3, end) 4.2s forwards,
              dd-kalp-nabiz 1.3s steps(2, end) 4.9s infinite;

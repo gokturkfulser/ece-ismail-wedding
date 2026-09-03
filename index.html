@@ -131,13 +131,9 @@
          Zaman çizelgesi (sn): 0.6 giriş · 4.0 buluşma · 4.2 kalp · 4.4 konfeti
          · 5.2 yazı.
 
-         Sprite'lar assets/img/ altında. width/height DOSYANIN GERÇEK piksel
-         ölçüsü olmalı (CLS 0 için) — CSS'in beklediği değil.
-
-         >>> BEKLEYEN İŞ: damat sprite'ı ortak grid'e taşınıyor, 68×142 → 49×103.
-         Yeni PNG'ler gelince aşağıdaki iki damat satırında width="68" height="142"
-         → width="49" height="103" yapılacak. CSS (19. bölüm) zaten 49 varsayıyor.
-         Gelin 60×103 olarak kalıyor, ona dokunulmuyor.
+         Sprite'lar assets/img/ altında, width/height DOSYANIN GERÇEK piksel
+         ölçüsü (CLS 0 için): gelin 69×114, damat 68×142.
+         Ölçek 5:4 — CSS'te gelin `69 * --unit`, damat `68 * --unit * 0.8`.
 
          PNG'ler pixel art: optimize/yeniden boyutlandırma/WebP dönüşümü YAPILMAZ.
          --------------------------------------------------------------------- -->
@@ -149,8 +145,8 @@
         <!-- loading="lazy" YOK — bilinçli. Dördü tek zamanlı animasyonun
              kareleri; göz kırpma karesi 4.4s'te opacity 1'e geçiyor ve o an
              yüklü değilse yüz bir kare kayboluyor. Dördü toplam ~49KB. -->
-        <img class="kisi gelin" alt="" src="assets/img/gelin.png" width="60" height="103" decoding="async">
-        <img class="kisi gelin kirpik" alt="" src="assets/img/gelin-blink.png" width="60" height="103" decoding="async">
+        <img class="kisi gelin" alt="" src="assets/img/gelin.png" width="69" height="114" decoding="async">
+        <img class="kisi gelin kirpik" alt="" src="assets/img/gelin-blink.png" width="69" height="114" decoding="async">
         <img class="kisi damat" alt="" src="assets/img/damat.png" width="68" height="142" decoding="async">
         <img class="kisi damat kirpik" alt="" src="assets/img/damat-blink.png" width="68" height="142" decoding="async">
 

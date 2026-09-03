@@ -37,19 +37,20 @@
   height: 2px; background: rgba(36, 31, 51, .35);
 }
 
-/* karakterler — 11:8 oranı burada kilitli, bozma */
+/* karakterler — 5:4 ölçek oranı burada kilitli, bozma.
+   gelin 114 birim boy, damat 142; 114*5 = 570 ile 142*4 = 568 eşitleniyor. */
 .dugun-davetiye .kisi {
   position: absolute; bottom: 24%;
   image-rendering: pixelated;
 }
 .dugun-davetiye .gelin {
-  width: calc(60 * var(--unit));
-  left: 50%; margin-left: calc(-60 * var(--unit) - 10px);
+  width: calc(69 * var(--unit));
+  left: 50%; margin-left: calc(-69 * var(--unit) - 10px);
   animation: dd-gel-sol 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .6s 7;
 }
 .dugun-davetiye .damat {
-  width: calc(68 * var(--unit) * 0.727);
+  width: calc(68 * var(--unit) * 0.8);
   left: 50%; margin-left: 10px;
   animation: dd-gel-sag 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .75s 7;
