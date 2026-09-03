@@ -18,7 +18,8 @@
      11. Scroll reveal
      12. Partiküller
      13. Piksel davetiye sahnesi
-     14. Başlat
+     14. Debug paneli (?debug=1)
+     15. Başlat
    ============================================================================= */
 
 (function () {
@@ -34,13 +35,20 @@
   var OPT = C.options || {};
 
   var LS_MUTED = 'wed:muted';
-  var LS_RSVP = 'wed:rsvp';
+  var LS_RSVP = 'rsvp';
 
   var MOBILE_MEDIA = '(max-width: 767px)';
 
   var prefersReducedMotion =
     window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ?debug=1 varsa manuel test paneli açılır (bkz. bölüm 14). Normal
+  // ziyaretçide bu param hiç olmayacağı için panel asla görünmez.
+  var debugMode = (function () {
+    try { return new URLSearchParams(window.location.search).get('debug') === '1'; }
+    catch (e) { return false; }
+  })();
 
 
   /* ==========================================================================
@@ -130,10 +138,11 @@
       if (!isNaN(n) && n >= 1) out.guests = Math.min(n, OPT.maxGuests || C.maxGuests || 10);
     }
 
-    var ref = new URLSearchParams();
-    if (d) ref.set('d', out.name);
-    if (out.guests !== null) ref.set('k', String(out.guests));
-    out.ref = ref.toString();
+    // URL-encode YOK: sheet'te/mailde okunaklı kalsın diye "d=...;k=..." düz metin.
+    var refParts = [];
+    if (d) refParts.push('d=' + out.name);
+    if (out.guests !== null) refParts.push('k=' + out.guests);
+    out.ref = refParts.join(';');
 
     return out;
   })();
@@ -650,14 +659,30 @@
   /* ==========================================================================
      10. RSVP
      -----------------------------------------------------------------------
-     Gönderim: fetch POST, Content-Type "text/plain;charset=utf-8".
-     application/json preflight tetikler; Apps Script OPTIONS'a cevap veremez.
+     Gönderim üç aşamalı fallback zinciri:
+       A) fetch + text/plain body + res.json() — birincil yol.
+          application/json KULLANILMAZ: preflight OPTIONS tetikler, Apps
+          Script OPTIONS'a cevap veremediği için CORS hatası alırdık.
+       B) A, CORS/TypeError ile patlarsa → navigator.sendBeacon (ateşle-unut,
+          cevap okunamaz, iyimser başarı gösterilir).
+       C) sendBeacon kullanılamıyorsa/false dönerse → fetch mode:'no-cors'
+          (yine cevap okunamaz, iyimser başarı gösterilir).
+     Sunucudan gelen data.error kodu SERVER_ERROR_MESSAGES ile Türkçeye
+     çevrilir; eşleşmeyen kod veya ağ hatasında genel mesajlar kullanılır.
      ========================================================================== */
 
   var rsvp = {
     submitting: false,
-    lastPayload: null
+    lastPayload: null,
+    lastStage: null,     // 'A' | 'B' | 'C' — debug paneli için
+    lastOutcome: null     // 'success' | 'optimistic' | 'server_error' | 'network_error'
   };
+
+  function debugLog() {
+    if (!C.rsvpDebug || !window.console) return;
+    var args = ['[RSVP]'].concat(Array.prototype.slice.call(arguments));
+    console.log.apply(console, args);
+  }
 
   function setupRsvp() {
     var section = $('#rsvp');
@@ -674,7 +699,12 @@
       if (closed) closed.classList.remove('is-hidden');
       return;
     }
-    if (closed) closed.remove();
+    // Debug modunda kapalı bloğu DOM'da (gizli) tutuyoruz: panelin "Deadline'ı
+    // geçmiş yap" butonu buna ihtiyaç duyuyor. Normal ziyaretçide kaldırılır.
+    if (closed) {
+      if (debugMode) closed.classList.add('is-hidden');
+      else closed.remove();
+    }
 
     // --- Alan referansları -------------------------------------------------
     var nameInput = $('#rsvp-name');
@@ -696,29 +726,41 @@
     if (invitee.name) nameInput.value = invitee.name;
     if (invitee.guests !== null) guestsInput.value = String(invitee.guests);
 
+    // --- "Cevabınızı aldık" bloğu: {ad} yerine kayıtlı ismi basar ve
+    //     "Cevabımı Güncelle" butonunu forma dönecek şekilde bağlar. ---------
+    function showAlreadyNote(name) {
+      if (!note) return;
+      var p = $('p[data-text="text.rsvpAlreadyText"]', note);
+      var template = T.rsvpAlreadyText ||
+        'Cevabınızı aldık, teşekkür ederiz — {ad}. Güncellemek isterseniz aşağıdan tekrar gönderebilirsiniz.';
+      if (p) p.textContent = template.replace('{ad}', name || '');
+
+      var reopen = $('#rsvp-reopen', note);
+      if (reopen) {
+        reopen.onclick = function () {
+          note.classList.add('is-hidden');
+          form.hidden = false;
+          setStatus('');
+          nameInput.focus();
+        };
+      }
+      note.classList.remove('is-hidden');
+    }
+
     // --- Daha önce cevap verilmiş mi? -------------------------------------
     var saved = null;
     try { saved = JSON.parse(storeGet(LS_RSVP) || 'null'); } catch (e) { saved = null; }
 
     if (saved && note) {
-      note.classList.remove('is-hidden');
       form.hidden = true;
       // Kaydedilmiş cevabı forma geri yükle — kullanıcı güncellemek isterse hazır
       if (saved.name) nameInput.value = saved.name;
       if (saved.guests) guestsInput.value = String(saved.guests);
-      if (saved.message) messageInput.value = saved.message;
       if (saved.attending) {
         var savedRadio = $('#rsvp-form input[name="attending"][value="' + saved.attending + '"]');
         if (savedRadio) savedRadio.checked = true;
       }
-      var reopen = $('#rsvp-reopen');
-      if (reopen) {
-        reopen.addEventListener('click', function () {
-          note.classList.add('is-hidden');
-          form.hidden = false;
-          nameInput.focus();
-        });
-      }
+      showAlreadyNote(saved.name);
     } else if (note) {
       note.classList.add('is-hidden');
     }
@@ -788,7 +830,87 @@
       retryWrap.classList.toggle('is-hidden', !show);
     }
 
+    // --- Sunucu error kodu → Türkçe mesaj -----------------------------------
+    var SERVER_ERROR_MESSAGES = {
+      closed: T.rsvpErrorClosed || 'Katılım bildirimi süresi sona erdi.',
+      // Şu anki backend bu durumda "deadline_passed" döner — ikisini de eşle.
+      deadline_passed: T.rsvpErrorClosed || 'Katılım bildirimi süresi sona erdi.',
+      invalid_name: T.rsvpErrorInvalidName || 'Lütfen adınızı ve soyadınızı girin.',
+      invalid_attending: T.rsvpErrorInvalidAttending || 'Lütfen katılım durumunuzu seçin.',
+      forbidden: T.rsvpErrorForbidden || 'Bir sorun oluştu, lütfen sayfayı yenileyip tekrar deneyin.',
+      busy: T.rsvpErrorBusy || 'Sistem yoğun, lütfen birkaç saniye sonra tekrar deneyin.'
+    };
+
+    function serverErrorMessage(code) {
+      return SERVER_ERROR_MESSAGES[code] ||
+        (T.rsvpServerError || 'Cevabınız gönderilemedi. Lütfen tekrar deneyin.');
+    }
+
     // --- Gönderim ----------------------------------------------------------
+    // Aşama A: fetch + JSON. CORS/TypeError ile patlarsa Aşama B'ye düşer.
+    function sendStageA(payload) {
+      var controller = (typeof AbortController === 'function') ? new AbortController() : null;
+      var timeoutId = controller
+        ? window.setTimeout(function () { controller.abort(); }, 15000)
+        : null;
+
+      return fetch(C.rsvpEndpoint, {
+        method: 'POST',
+        // application/json PREFLIGHT tetikler → Apps Script OPTIONS'a cevap
+        // veremez. text/plain "simple request" sayılır, preflight olmaz.
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        signal: controller ? controller.signal : undefined
+      })
+        .then(function (res) {
+          if (timeoutId) window.clearTimeout(timeoutId);
+          return res.json();
+        })
+        .catch(function (err) {
+          if (timeoutId) window.clearTimeout(timeoutId);
+          throw err;
+        });
+    }
+
+    // Aşama B: sendBeacon (ateşle-unut). false dönerse Aşama C'ye düşer.
+    function sendStageB(payload) {
+      rsvp.lastStage = 'B';
+      debugLog('Aşama B: sendBeacon');
+      var sent = false;
+      if (navigator.sendBeacon) {
+        try {
+          var blob = new Blob([JSON.stringify(payload)], { type: 'text/plain;charset=utf-8' });
+          sent = navigator.sendBeacon(C.rsvpEndpoint, blob);
+        } catch (e) { sent = false; }
+      }
+      if (sent) {
+        rsvp.lastOutcome = 'optimistic';
+        onOptimisticSuccess(payload);
+      } else {
+        sendStageC(payload);
+      }
+    }
+
+    // Aşama C: fetch mode:'no-cors' — cevap opak, iyimser başarı gösterilir.
+    function sendStageC(payload) {
+      rsvp.lastStage = 'C';
+      debugLog('Aşama C: fetch no-cors');
+      fetch(C.rsvpEndpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+        .then(function () {
+          rsvp.lastOutcome = 'optimistic';
+          onOptimisticSuccess(payload);
+        })
+        .catch(function (err) {
+          rsvp.lastOutcome = 'network_error';
+          onFailure(err);
+        });
+    }
+
     function send(payload) {
       if (rsvp.submitting) return;          // çift submit engeli
       rsvp.submitting = true;
@@ -798,45 +920,30 @@
       setStatus('');
       showRetry(false);
 
-      // AbortController: takılı kalan istek yerine anlaşılır hata mesajı
-      var controller = null;
-      var timeoutId = null;
-      if (typeof AbortController === 'function') {
-        controller = new AbortController();
-        timeoutId = window.setTimeout(function () { controller.abort(); }, 15000);
-      }
-
-      fetch(C.rsvpEndpoint, {
-        method: 'POST',
-        // application/json PREFLIGHT tetikler → Apps Script OPTIONS'a cevap
-        // veremez. text/plain "simple request" sayılır, preflight olmaz.
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-        redirect: 'follow',
-        signal: controller ? controller.signal : undefined
-      })
-        .then(function (res) {
-          if (timeoutId) window.clearTimeout(timeoutId);
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.text();
-        })
-        .then(function (body) {
-          // Apps Script bazen JSON dışı gövde döndürebilir; gövde parse
-          // edilemezse HTTP 200'ü başarı kabul ediyoruz.
-          var data = null;
-          try { data = JSON.parse(body); } catch (e) { data = null; }
-          if (data && data.ok === false) {
-            throw new Error(data.error || 'server');
+      rsvp.lastStage = 'A';
+      debugLog('Aşama A: fetch + json');
+      sendStageA(payload)
+        .then(function (data) {
+          if (data && data.ok) {
+            rsvp.lastOutcome = 'success';
+            onSuccess(payload);
+          } else {
+            rsvp.lastOutcome = 'server_error';
+            onServerError(data && data.error);
           }
-          onSuccess(payload);
         })
         .catch(function (err) {
-          if (timeoutId) window.clearTimeout(timeoutId);
-          onFailure(err);
+          if (err instanceof TypeError) {
+            debugLog('Aşama A CORS/TypeError ile başarısız, Aşama B deneniyor', err);
+            sendStageB(payload);
+          } else {
+            rsvp.lastOutcome = 'network_error';
+            onFailure(err);
+          }
         });
     }
 
-    function onSuccess(payload) {
+    function persistAndCelebrate(payload, message) {
       setBusy(false);
       rsvp.submitting = false;
 
@@ -844,41 +951,46 @@
         name: payload.name,
         attending: payload.attending,
         guests: payload.guests,
-        message: payload.message,
-        ts: new Date().toISOString()
+        at: new Date().toISOString()
       }));
 
-      setStatus(T.rsvpSuccess || 'Teşekkürler, cevabınız bize ulaştı.', 'success');
+      setStatus(message, 'success');
       showRetry(false);
 
       // Formu kapat, "aldık — güncellemek ister misiniz?" bloğunu göster
       window.setTimeout(function () {
         form.hidden = true;
-        if (note) {
-          note.classList.remove('is-hidden');
-          var reopen = $('#rsvp-reopen');
-          if (reopen) {
-            reopen.onclick = function () {
-              note.classList.add('is-hidden');
-              form.hidden = false;
-              setStatus('');
-              nameInput.focus();
-            };
-          }
-        }
+        showAlreadyNote(payload.name);
       }, 1800);
+    }
+
+    function onSuccess(payload) {
+      persistAndCelebrate(payload, T.rsvpSuccess || 'Teşekkürler, cevabınız bize ulaştı.');
+    }
+
+    // Aşama B/C'ye düşülünce: cevap okunamadı, farklı (iyimser) başarı metni.
+    function onOptimisticSuccess(payload) {
+      persistAndCelebrate(payload, T.rsvpSuccessFallback ||
+        'Cevabınız iletildi. Bir aksilik olduğunu düşünürseniz bize doğrudan yazın.');
+    }
+
+    function onServerError(code) {
+      setBusy(false);
+      rsvp.submitting = false;
+      setStatus(serverErrorMessage(code), 'error');
+      showRetry(true);
     }
 
     function onFailure(err) {
       setBusy(false);
       rsvp.submitting = false;
 
-      var isNetwork = !err || err.name === 'AbortError' ||
-        err.name === 'TypeError' || /Failed to fetch|NetworkError|Load failed/i.test(String(err.message));
+      var isNetwork = !err || err.name === 'AbortError' || err instanceof TypeError ||
+        /Failed to fetch|NetworkError|Load failed/i.test(String(err && err.message));
 
       setStatus(isNetwork
         ? (T.rsvpNetworkError || 'Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.')
-        : (T.rsvpServerError || 'Cevabınız kaydedilemedi. Lütfen birazdan tekrar deneyin.'), 'error');
+        : serverErrorMessage(), 'error');
 
       showRetry(true);
     }
@@ -907,6 +1019,7 @@
         guests: parseInt(guestsInput.value, 10),
         message: messageInput.value.trim().slice(0, C.messageMaxLength || 500),
         ref: invitee.ref,
+        token: C.rsvpToken || '',
         website: ''
       });
     });
@@ -1086,7 +1199,138 @@
 
 
   /* ==========================================================================
-     14. BAŞLAT
+     14. DEBUG PANELİ (?debug=1)
+     -----------------------------------------------------------------------
+     Manuel tarayıcı testi için: URL'de ?debug=1 yoksa bu fonksiyon hiçbir
+     şey yapmaz (panel oluşturulmaz, DOM'a tek bir eleman bile eklenmez).
+     CSS tamamen inline — style.css'e hiç dokunmuyoruz.
+     ========================================================================== */
+
+  function setupDebugPanel() {
+    if (!debugMode) return;
+
+    function truncateMiddle(str, keepStart, keepEnd) {
+      str = str || '';
+      if (str.length <= keepStart + keepEnd + 1) return str;
+      return str.slice(0, keepStart) + '…' + str.slice(str.length - keepEnd);
+    }
+
+    function readSaved() {
+      try { return JSON.parse(storeGet(LS_RSVP) || 'null'); } catch (e) { return null; }
+    }
+
+    function deadlineInfo() {
+      var d = parseDate(C.rsvpDeadlineISO);
+      if (!d) return 'yok';
+      var passed = Date.now() > d.getTime();
+      return d.toLocaleString('tr-TR') + (passed ? ' — GEÇTİ' : ' — açık');
+    }
+
+    var STAGE_LABELS = { A: 'A · fetch+json', B: 'B · sendBeacon', C: 'C · no-cors' };
+    var OUTCOME_LABELS = {
+      success: 'başarılı',
+      optimistic: 'iyimser başarı',
+      server_error: 'sunucu hatası',
+      network_error: 'ağ hatası'
+    };
+
+    function stageInfo() {
+      if (!rsvp.lastStage) return '— (henüz gönderim yok)';
+      var stage = STAGE_LABELS[rsvp.lastStage] || rsvp.lastStage;
+      var outcome = OUTCOME_LABELS[rsvp.lastOutcome] || rsvp.lastOutcome || '…';
+      return stage + ' (' + outcome + ')';
+    }
+
+    // --- İskelet -------------------------------------------------------------
+    var panel = el('div', {
+      id: 'rsvp-debug-panel',
+      style: 'position:fixed;left:0;right:0;bottom:0;z-index:2147483647;' +
+        'background:rgba(15,15,20,.94);color:#e8e8ec;' +
+        'font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;' +
+        'padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px 16px;' +
+        'align-items:center;border-top:1px solid rgba(255,255,255,.18);' +
+        'max-height:42vh;overflow:auto;box-sizing:border-box'
+    });
+
+    var rows = el('div', {
+      style: 'display:flex;flex-wrap:wrap;gap:4px 16px;flex:1 1 260px'
+    });
+    var actions = el('div', { style: 'display:flex;flex-wrap:wrap;gap:6px' });
+
+    function field(label) {
+      var wrap = el('div', { style: 'white-space:nowrap' });
+      wrap.appendChild(el('b', { text: label + ': ', style: 'color:#9fd8ff;font-weight:600' }));
+      var v = el('span', { text: '…' });
+      wrap.appendChild(v);
+      rows.appendChild(wrap);
+      return v;
+    }
+
+    function button(label, onClick) {
+      var b = el('button', {
+        type: 'button',
+        text: label,
+        style: 'font:inherit;padding:3px 8px;border-radius:4px;' +
+          'border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);' +
+          'color:inherit;cursor:pointer'
+      });
+      b.addEventListener('click', onClick);
+      actions.appendChild(b);
+      return b;
+    }
+
+    var endpointField = field('endpoint');
+    var deadlineField = field('deadline');
+    var stageField = field('son fallback');
+    var storedField = field('localStorage.rsvp');
+
+    function refresh() {
+      endpointField.textContent = truncateMiddle(C.rsvpEndpoint, 30, 12);
+      deadlineField.textContent = deadlineInfo();
+      stageField.textContent = stageInfo();
+
+      var saved = readSaved();
+      storedField.textContent = saved
+        ? (saved.name + ' · ' + saved.attending + ' · ' + saved.guests + ' kişi · ' + saved.at)
+        : 'yok';
+    }
+
+    // --- Aksiyonlar ------------------------------------------------------------
+    button('localStorage temizle', function () {
+      try { window.localStorage.removeItem(LS_RSVP); } catch (e) { /* yoksay */ }
+      refresh();
+    });
+
+    var honeypotBtn = button('Honeypot doldur', function () {
+      var input = $('#rsvp-website');
+      if (!input) return;
+      var wasFilled = input.value.trim() !== '';
+      input.value = wasFilled ? '' : 'debug-bot';
+      honeypotBtn.textContent = wasFilled ? 'Honeypot doldur' : 'Honeypot temizle';
+    });
+
+    button("Deadline'ı geçmiş yap", function () {
+      // Sadece bellekte/DOM'da simüle eder — CONFIG.rsvpDeadlineISO'ya dokunmaz.
+      var form = $('#rsvp-form');
+      var note = $('#rsvp-note');
+      var closedBlock = $('#rsvp-closed');
+      if (form) form.hidden = true;
+      if (note) note.classList.add('is-hidden');
+      if (closedBlock) closedBlock.classList.remove('is-hidden');
+      refresh();
+    });
+
+    panel.appendChild(rows);
+    panel.appendChild(actions);
+    document.body.appendChild(panel);
+
+    refresh();
+    window.setInterval(refresh, 2000);
+  }
+
+
+  /* ==========================================================================
+     15. BAŞLAT
      ========================================================================== */
 
   function renderGreeting() {
@@ -1120,6 +1364,7 @@
     setupReveal();
     setupParticles();
     setupPixelScene();
+    setupDebugPanel();
 
     // Kapı ekranı yoksa (ör. elle kaldırıldıysa) slideshow yine başlasın
     if (!$('#gate')) startHeroSlideshow();

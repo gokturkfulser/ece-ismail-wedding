@@ -37,10 +37,15 @@ window.CONFIG = {
   venueCoords: { lat: 39.797014, lng: 32.693879 },
 
   /* ------------------------------------------------------------------- RSVP */
-  rsvpDeadlineISO: "2026-09-12T23:59:59+03:00",
+  rsvpDeadlineISO: "2027-09-26T23:59:59+03:00",
   // Apps Script Web App URL'i. Deploy sonrası aldığın .../exec adresi.
   // Deploy ayarları: Execute as = Me, Who has access = Anyone. (README'ye bak)
-  rsvpEndpoint: "https://script.google.com/macros/s/PLACEHOLDER_DEPLOYMENT_ID/exec",
+  rsvpEndpoint: "https://script.google.com/macros/s/AKfycbwEVvubY2riRLlo3JtEtzif9TDDpjSJQihDZJHfdvXlm-fSoMKsSEgbwtqnrVloU3jHxQ/exec",
+  // Apps Script tarafında doğrulanacak paylaşım anahtarı. Sheet ID GİBİ GİZLİ
+  // DEĞİL — sadece rastgele bot POST'larını ayıklamaya yarar, repoda durabilir.
+  rsvpToken: "dugun2027",
+  // true ise gönderim akışının her aşaması konsola loglanır (debug amaçlı).
+  rsvpDebug: false,
   maxGuests: 10,
   messageMaxLength: 500,
 
@@ -97,17 +102,26 @@ window.CONFIG = {
     rsvpSubmitting: "Gönderiliyor…",
 
     rsvpSuccess: "Teşekkürler, cevabınız bize ulaştı.",
+    // sendBeacon / no-cors fallback'e düşülünce (cevap okunamaz, iyimser mesaj)
+    rsvpSuccessFallback: "Cevabınız iletildi. Bir aksilik olduğunu düşünürseniz bize doğrudan yazın.",
     rsvpNetworkError: "Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.",
-    rsvpServerError: "Cevabınız kaydedilemedi. Lütfen birazdan tekrar deneyin.",
-    rsvpRetry: "Tekrar dene",
+    rsvpServerError: "Cevabınız gönderilemedi. Lütfen tekrar deneyin.",
+    rsvpRetry: "Tekrar Dene",
 
     rsvpErrorAttending: "Lütfen katılım durumunuzu seçin.",
     rsvpErrorName: "Lütfen adınızı ve soyadınızı yazın.",
     rsvpErrorGuests: "Kişi sayısı geçerli değil.",
 
-    // Daha önce cevap verildiyse
-    rsvpAlreadyText: "Cevabınızı aldık — güncellemek ister misiniz?",
-    rsvpAlreadyButton: "Cevabımı güncelle",
+    // Sunucudan gelen error koduna göre eşlenen metinler (bkz. app.js SERVER_ERROR_MESSAGES)
+    rsvpErrorClosed: "Katılım bildirimi süresi sona erdi.",
+    rsvpErrorInvalidName: "Lütfen adınızı ve soyadınızı girin.",
+    rsvpErrorInvalidAttending: "Lütfen katılım durumunuzu seçin.",
+    rsvpErrorForbidden: "Bir sorun oluştu, lütfen sayfayı yenileyip tekrar deneyin.",
+    rsvpErrorBusy: "Sistem yoğun, lütfen birkaç saniye sonra tekrar deneyin.",
+
+    // Daha önce cevap verildiyse. {ad} yerine kaydedilen isim basılır.
+    rsvpAlreadyText: "Cevabınızı aldık, teşekkür ederiz — {ad}. Güncellemek isterseniz aşağıdan tekrar gönderebilirsiniz.",
+    rsvpAlreadyButton: "Cevabımı Güncelle",
 
     // Son tarih geçtiyse
     rsvpClosedTitle: "Katılım bildirimi kapandı",
