@@ -88,7 +88,7 @@ CONFIG'e bağlı.
 | `text.inviteBody` | **Dizi** — her eleman bir `<p>` olur | İstediğin kadar paragraf ekle |
 | `gate` | Kapı ekranı arka plan görseli | `portrait` = mobil, `landscape` = masaüstü |
 | `hero[]` | Slideshow görselleri (3-4 tane ideal) | Her biri `portrait` + `landscape` + `width`/`height` |
-| `gallery[]` | Galeri görselleri | `options.gallery: false` ile bölüm tamamen kalkar |
+| `photo` | Hero'nun altında, sayfanın üst bölgesindeki tek görsel | `portrait` = mobil, `landscape` = masaüstü. Boş bırakırsan bölüm tamamen kalkar |
 | `audio.src` | Müzik dosyası yolu | Boş bırakırsan müzik özelliği tamamen devre dışı |
 | `audio.targetVolume` | 0–1 arası hedef ses seviyesi | Fade-in 0'dan buraya çıkar |
 | `audio.fadeInMs` | Fade-in süresi (ms) | |
@@ -298,7 +298,8 @@ görselle gelmiyor. Kendi fotoğraflarını **aynı dosya adlarıyla** üzerine 
 | `gate-landscape.webp` | 1920×1080 | Kapı ekranı, masaüstü |
 | `hero-1..4-portrait.webp` | 1080×1620 | Slideshow, mobil |
 | `hero-1..4-landscape.webp` | 1600×900 | Slideshow, masaüstü |
-| `gallery-1..6.webp` | 1200×800 | Galeri |
+| `photo-portrait.webp` | 1080×1350 | Üst bölge fotoğrafı, mobil |
+| `photo-landscape.webp` | 1600×1067 | Üst bölge fotoğrafı, masaüstü |
 | `og.png` | 1200×630 | Sosyal medya kartı (WebP değil — scraper uyumu) |
 | `favicon-32.png` | 32×32 | Favicon |
 | `apple-touch-icon.png` | 180×180 | iOS ana ekran ikonu |
@@ -321,9 +322,13 @@ ffmpeg -i kapak.jpg -vf "scale=1080:1920:force_original_aspect_ratio=increase,cr
 ffmpeg -i kapak.jpg -vf "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080" \
   -c:v libwebp -q:v 82 gate-landscape.webp
 
-# --- Galeri 1200x800 ---
-ffmpeg -i foto.jpg -vf "scale=1200:800:force_original_aspect_ratio=increase,crop=1200:800" \
-  -c:v libwebp -q:v 78 gallery-1.webp
+# --- Üst bölge fotoğrafı: dikey kırpım (mobil) 1080x1350 ---
+ffmpeg -i foto.jpg -vf "scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350" \
+  -c:v libwebp -q:v 80 photo-portrait.webp
+
+# --- Üst bölge fotoğrafı: yatay kırpım (masaüstü) 1600x1067 ---
+ffmpeg -i foto.jpg -vf "scale=1600:1067:force_original_aspect_ratio=increase,crop=1600:1067" \
+  -c:v libwebp -q:v 80 photo-landscape.webp
 
 # --- OG kartı (PNG, 1200x630) ---
 ffmpeg -i kapak.jpg -vf "scale=1200:630:force_original_aspect_ratio=increase,crop=1200:630" \
@@ -380,7 +385,7 @@ Trafiğin %95'i WhatsApp içi tarayıcıdan gelen telefon. Hedef:
 
 - Kapı ekranı görseli: **< 200 KB** (LCP elemanı, en kritik dosya)
 - Hero slaytları: **< 150 KB** / adet
-- Galeri: **< 100 KB** / adet
+- Üst bölge fotoğrafı: **< 150 KB** / adet
 
 Kontrol: `ls -lhS assets/img/`
 

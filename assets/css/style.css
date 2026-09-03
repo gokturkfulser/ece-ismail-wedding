@@ -727,6 +727,35 @@ a:hover { color: var(--c-accent-hover); }
   color: var(--c-text-invert);
 }
 
+/* Aşağı kaydır ipucu — sayfa hero'dan sonra boş görünmesin, özellikle mobilde */
+.hero__scroll {
+  position: absolute;
+  left: 50%;
+  bottom: var(--sp-5);
+  z-index: var(--z-content);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--c-line-invert);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--c-text-invert);
+  cursor: pointer;
+  transform: translateX(-50%);
+  animation: hero-scroll-bounce 2.2s ease-in-out infinite;
+  transition: opacity var(--dur-fade) var(--ease);
+}
+.hero__scroll.is-hidden { opacity: 0; pointer-events: none; }
+.hero__scroll svg { width: 1.25rem; height: 1.25rem; }
+
+@keyframes hero-scroll-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(6px); }
+}
+
 
 /* =============================================================================
    09. SES KONTROLÜ
@@ -889,34 +918,30 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   13. GALERİ
+   13. FOTOĞRAF
+   -----------------------------------------------------------------------------
+   Hero'nun hemen altında, sayfanın üst bölgesinde tek görsel (CONFIG.photo).
    ============================================================================= */
 
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--sp-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.photo { padding-top: 0; }
+
+.photo__figure {
+  margin: 0 auto;
+  max-width: 34rem;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.photo__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
 }
 @media (min-width: 48rem) {
-  .gallery {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--sp-4);
-  }
+  .photo__figure img { aspect-ratio: 3 / 2; }
 }
-
-.gallery__item { margin: 0; overflow: hidden; border-radius: var(--radius); }
-
-.gallery__item img {
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  transition: transform var(--dur-slow) var(--ease-out);
-}
-.gallery__item img:hover { transform: scale(1.04); }
 
 
 /* =============================================================================
@@ -1413,7 +1438,7 @@ a:hover { color: var(--c-accent-hover); }
   margin-top: .5em; font-size: clamp(12px, 2.7vw, 15px);
   letter-spacing: .34em; opacity: .72;
 }
-@keyframes dd-belir { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+@keyframes dd-belir { from { opacity: 0; transform: translateY(-8px) } to { opacity: 1; transform: none } }
 
 /* Sahne görünene kadar beklet; app.js IntersectionObserver ile .is-running
    ekler, JS yoksa .no-js kaçışı yine başlatır.
@@ -1466,8 +1491,7 @@ a:hover { color: var(--c-accent-hover); }
 
   [data-reveal] { opacity: 1; transform: none; transition: none; }
 
-  .gallery__item img { transition: none; }
-  .gallery__item img:hover { transform: none; }
+  .hero__scroll { animation: none; }
 
   .btn:active,
   .audio-toggle:active { transform: none; }

@@ -219,12 +219,31 @@
         <span class="hero__venue" data-text="venueName"></span>
       </p>
     </div>
+
+    <!-- Aşağıda form/detay olduğunu göstermek için — özellikle mobilde sayfa
+         hero'dan sonra boş görünmesin diye. Tıklanınca bir sonraki bölüme
+         kaydırır; prefers-reduced-motion açıkken zıplama durur ama ok kalır. -->
+    <button class="hero__scroll" type="button" id="hero-scroll" aria-label="Aşağı kaydır">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 9l6 6 6-6"></path>
+      </svg>
+    </button>
   </header>
 
   <main>
 
     <!-- ========================================================================
-         2. DAVETİYE METNİ
+         2. FOTOĞRAF — sayfanın üst bölgesinde tek görsel (CONFIG.photo)
+         ======================================================================== -->
+    <section class="section photo" id="photo">
+      <div class="section__inner section__inner--wide">
+        <figure class="photo__figure" id="photo-figure" data-reveal><!-- CONFIG.photo → app.js --></figure>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         3. DAVETİYE METNİ
          ======================================================================== -->
     <section class="section" id="invite" aria-labelledby="invite-title">
       <div class="section__inner">
@@ -239,7 +258,7 @@
     </section>
 
     <!-- ========================================================================
-         3. ETKİNLİK DETAYI
+         4. ETKİNLİK DETAYI
          ======================================================================== -->
     <section class="section section--alt" id="details" aria-labelledby="details-title">
       <div class="section__inner">
@@ -278,7 +297,7 @@
     </section>
 
     <!-- ========================================================================
-         4. GERİ SAYIM
+         5. GERİ SAYIM
          ======================================================================== -->
     <section class="section section--dark" id="countdown-section" aria-labelledby="countdown-title">
       <div class="particles" data-particles aria-hidden="true"></div>
@@ -308,17 +327,6 @@
 
         <!-- Tarih geçtiyse app.js listeyi gizler, bunu gösterir -->
         <p class="countdown-done is-hidden" id="countdown-done" data-text="text.countdownDone"></p>
-      </div>
-    </section>
-
-    <!-- ========================================================================
-         5. GALERİ  (CONFIG.options.gallery = false ise app.js kaldırır)
-         ======================================================================== -->
-    <section class="section" id="gallery" aria-labelledby="gallery-title">
-      <div class="section__inner section__inner--wide">
-        <h2 class="section__title" id="gallery-title" data-text="text.galleryTitle" data-reveal></h2>
-        <hr class="section__rule">
-        <ul class="gallery" id="gallery-list" data-reveal><!-- CONFIG.gallery → app.js --></ul>
       </div>
     </section>
 

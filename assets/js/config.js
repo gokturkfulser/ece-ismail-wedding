@@ -80,9 +80,6 @@ window.CONFIG = {
     countdownSeconds: "Saniye",
     countdownDone: "Bugün o gün! Mutluluğumuzu bizimle paylaştığınız için teşekkür ederiz.",
 
-    // Galeri
-    galleryTitle: "Biz",
-
     // RSVP formu
     rsvpTitle: "Katılım Bildirimi",
     rsvpIntro: "Lütfen katılım durumunuzu bildirin, hazırlıklarımızı buna göre yapalım.",
@@ -171,14 +168,13 @@ window.CONFIG = {
     }
   ],
 
-  gallery: [
-    { src: "assets/img/gallery-1.webp", width: 1200, height: 800, alt: "Anı 1" },
-    { src: "assets/img/gallery-2.webp", width: 1200, height: 800, alt: "Anı 2" },
-    { src: "assets/img/gallery-3.webp", width: 1200, height: 800, alt: "Anı 3" },
-    { src: "assets/img/gallery-4.webp", width: 1200, height: 800, alt: "Anı 4" },
-    { src: "assets/img/gallery-5.webp", width: 1200, height: 800, alt: "Anı 5" },
-    { src: "assets/img/gallery-6.webp", width: 1200, height: 800, alt: "Anı 6" }
-  ],
+  // Hero'nun hemen altında, sayfanın üst bölgesinde görünen tek fotoğraf.
+  photo: {
+    portrait: "assets/img/photo-portrait.webp",
+    landscape: "assets/img/photo-landscape.webp",
+    width: 1600, height: 1067,
+    alt: "Ece ve İsmail"
+  },
 
   /* -------------------------------------------------------------------- Ses
      Dosya, kapı ekranındaki butona basılana kadar YÜKLENMEZ.
@@ -195,7 +191,6 @@ window.CONFIG = {
     kenBurnsMinSec: 20,     // Ken Burns zoom süresi alt sınır
     kenBurnsMaxSec: 26,     // Ken Burns zoom süresi üst sınır
     particles: true,        // dekoratif partikül katmanı (false = tamamen kapalı)
-    particleCount: 12,      // en fazla 12
-    gallery: true           // galeri bölümü
+    particleCount: 12       // en fazla 12
   }
 };

@@ -8,7 +8,7 @@
      01. Yardımcılar
      02. Kişiye özel link (?d= / ?k=)
      03. Metin doldurma ([data-text])
-     04. Görseller (kapı / hero / galeri)
+     04. Görseller (kapı / hero / fotoğraf)
      05. Kapı ekranı + müzik
      06. Hero slideshow + Ken Burns
      07. Geri sayım
@@ -249,19 +249,14 @@
     });
   }
 
-  function renderGallery() {
-    var section = $('#gallery');
-    var list = $('#gallery-list');
-    if (!section || !list) return;
+  function renderPhoto() {
+    var section = $('#photo');
+    var figure = $('#photo-figure');
+    if (!section || !figure) return;
 
-    if (OPT.gallery === false || !Array.isArray(C.gallery) || !C.gallery.length) {
-      section.remove();
-      return;
-    }
+    if (!C.photo) { section.remove(); return; }
 
-    C.gallery.forEach(function (item) {
-      list.appendChild(el('li', { class: 'gallery__item' }, [buildPicture(item)]));
-    });
+    figure.appendChild(buildPicture(C.photo));
   }
 
 
@@ -495,6 +490,30 @@
         slideshow.timer = window.setInterval(advance, interval);
       }
     });
+  }
+
+  // Aşağı kaydır ipucu: tıklanınca bir sonraki bölüme kaydırır, kullanıcı
+  // zaten kaydırmaya başlayınca (hero ekrandan çıkınca) kendini gizler.
+  function setupHeroScroll() {
+    var hero = $('#hero');
+    var btn = $('#hero-scroll');
+    if (!hero || !btn) return;
+
+    btn.addEventListener('click', function () {
+      var next = hero.nextElementSibling;
+      if (next && next.scrollIntoView) {
+        next.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      }
+    });
+
+    if (!window.IntersectionObserver) return;
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        btn.classList.toggle('is-hidden', entry.intersectionRatio < 0.6);
+      });
+    }, { threshold: 0.6 });
+    io.observe(hero);
   }
 
 
@@ -1087,10 +1106,11 @@
 
     renderGate();
     renderHeroSlides();
-    renderGallery();
+    renderPhoto();
 
     setupAudioToggle();
     setupGate();
+    setupHeroScroll();
 
     setupCountdown();
     setupCalendar();
