@@ -1215,7 +1215,7 @@ a:hover { color: var(--c-accent-hover); }
 
    ÖLÇEK: 5:4 ORANI (paket/OKU.md)
    -----------------------------------------------------------------------------
-   Gelin `69 * --unit`, damat `68 * --unit * 0.8`. İki sprite farklı
+   Gelin `68 * --unit`, damat `68 * --unit * 0.8`. İki sprite farklı
    çözünürlükte çizildi; 0.8 (= 4/5) çarpanı boylarını eşitliyor:
    gelin 114 birim boy, damat 142 -> 114*5 = 570 ile 142*4 = 568.
    Tek ölçek kolu `--unit`, sadece onu değiştir.
@@ -1263,11 +1263,13 @@ a:hover { color: var(--c-accent-hover); }
   --ayrik: calc(22 * var(--unit));
 
   /* Duruş anında gövde aralığı. ELLERİ BULUŞTURAN DEĞER — ölçümle bulundu:
-     gelinin içteki eli kendi tuval kenarından 2 kaynak piksel, damadın da
-     2 piksel içeride. Ölçekler farklı olduğu için ekranda 6.0px ve 4.8px
-     eder; eller değsin diye ikisi merkeze doğru 2 birim kayıyor.
-     69x114 sprite'a göre yeniden ayarlandı (eski 60x103'te 5 birimdi). */
-  --ic-ofset: calc(2 * var(--unit));
+     gelinin BOŞ olan içteki (sağ) eli kendi tuval kenarından 4 kaynak
+     piksel, damadın içteki (sol) eli 2 piksel içeride. Ölçekler farklı
+     olduğu için ekranda 12.0px ve 4.8px eder; eller değsin diye gereken
+     kayma (12.0+4.8)/2 = 8.4px, yani 2.80 birim. Tam sayı kalsın diye
+     3 birim: eller 1.2px örtüşüyor, gövdeler çarpışmıyor.
+     Çiçek dış (sol) elde olduğu için iç el serbest — 68x114 sprite. */
+  --ic-ofset: calc(3 * var(--unit));
 
   /* Zemin cizgisinin alttan yuksekligi. Kapida tam ekran oldugu icin
      asagi cekiliyor (bkz. .gate__scene .dugun-davetiye) - metin gokyuzunde,
@@ -1312,7 +1314,7 @@ a:hover { color: var(--c-accent-hover); }
 }
 
 /* karakterler — 5:4 oranı burada kilitli, bozma.
-   Gelin 69 birim geniş (kaynak 69x114), damat 68 birim * 0.8 (kaynak 68x142).
+   Gelin 68 birim geniş (kaynak 68x114), damat 68 birim * 0.8 (kaynak 68x142).
    Bölüm başlığındaki ÖLÇEK notuna bak. */
 .dugun-davetiye .kisi {
   position: absolute; bottom: var(--zemin);
@@ -1325,8 +1327,8 @@ a:hover { color: var(--c-accent-hover); }
   image-rendering: pixelated;
 }
 .dugun-davetiye .gelin {
-  width: calc(69 * var(--unit));
-  left: 50%; margin-left: calc(-69 * var(--unit) + var(--ic-ofset));
+  width: calc(68 * var(--unit));
+  left: 50%; margin-left: calc(-68 * var(--unit) + var(--ic-ofset));
   animation: dd-gel-sol 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .6s 7;
 }
@@ -1423,20 +1425,28 @@ a:hover { color: var(--c-accent-hover); }
    bu kural kısayolların ÜSTÜNDE olursa duraklatma hiç uygulanmaz ve 5.2s'lik
    çizelge kullanıcı sahneyi görmeden akıp biter.
 
-   `!important` bilinçli olarak YOK: 20. bölümdeki reduced-motion kuralı
-   `running !important` ile bunu ezebilsin (o kuralın specificity'si daha
-   düşük, sadece !important sayesinde kazanıyor). */
-.dugun-davetiye:not(.is-running) * { animation-play-state: paused; }
-.no-js .dugun-davetiye * { animation-play-state: running; }
+   `!important` ŞART. Kırpma katmanlarının seçicisi `.dugun-davetiye
+   .gelin.kirpik` (0,3,0) bu kuralın (0,2,0) üstünde; !important olmadan
+   kırpma katmanları HİÇ duraklatılmıyor ve sayfa yüklenirken serbest
+   akıyorlardı. Sonuç: açılış ekranında ~4.4s sonra ortada (el ele
+   pozisyonda) hayalet bir çift yanıp sönüyordu, ana katmanlar ise ayrık
+   duruyordu. Ölçümde kırpma katmanı yürüyüşte 20 adım ileri çıkmıştı.
+
+   Hareket-azaltma çakışması yok: o modda app.js `is-running`i hemen
+   ekliyor, dolayısıyla `:not(.is-running)` hiç eşleşmiyor. JS ölüyse
+   aşağıdaki `.no-js` kaçışı devralıyor (aynı !important, sonra geldiği
+   için kazanıyor). */
+.dugun-davetiye:not(.is-running) * { animation-play-state: paused !important; }
+.no-js .dugun-davetiye * { animation-play-state: running !important; }
 
 /* Küçük ekranlarda ölçeği düşür. DEĞER BİLİNÇLİ OLARAK TAM SAYI px:
    `--unit` ondalık olursa kaynak pikseller ekranda eşit genişlikte
    çizilmez (bir kısmı 3px, bir kısmı 2px olur) ve piksel gridi titrer.
    clamp()/vw tabanlı akışkan ölçek bu yüzden KULLANILMADI.
 
-   Eşik hesabı: --unit 3px'te iki karakter yan yana 60*3 + 49*3 = 327px.
-   Panel 94vw olduğu için 416px'lik ekranda panel 391px — sığıyor. Altında
-   2px'e düşüyoruz (218px). */
+   Eşik hesabı: iki karakter yan yana 68*u + 68*u*0.8 = 122.4*u.
+   --unit 3px'te 367px, 2px'te 245px. Kapı tam ekran olduğu için genişlik
+   sorun değil; bu eşik sahnenin panel olarak kullanıldığı hal için duruyor. */
 @media (max-width: 26rem) { .dugun-davetiye { --unit: 2px; } }
 
 

@@ -44,8 +44,8 @@
   image-rendering: pixelated;
 }
 .dugun-davetiye .gelin {
-  width: calc(69 * var(--unit));
-  left: 50%; margin-left: calc(-69 * var(--unit) - 10px);
+  width: calc(68 * var(--unit));
+  left: 50%; margin-left: calc(-68 * var(--unit) - 10px);
   animation: dd-gel-sol 3.4s steps(34, end) .6s both,
              dd-ziplama .5s steps(2, end) .6s 7;
 }
