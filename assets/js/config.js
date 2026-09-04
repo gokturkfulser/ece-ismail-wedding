@@ -37,7 +37,7 @@ window.CONFIG = {
   venueCoords: { lat: 39.797014, lng: 32.693879 },
 
   /* ------------------------------------------------------------------- RSVP */
-  rsvpDeadlineISO: "2027-09-26T23:59:59+03:00",
+  rsvpDeadlineISO: "2026-09-18T23:59:59+03:00",
   // Apps Script Web App URL'i. Deploy sonrası aldığın .../exec adresi.
   // Deploy ayarları: Execute as = Me, Who has access = Anyone. (README'ye bak)
   rsvpEndpoint: "https://script.google.com/macros/s/AKfycbwEVvubY2riRLlo3JtEtzif9TDDpjSJQihDZJHfdvXlm-fSoMKsSEgbwtqnrVloU3jHxQ/exec",

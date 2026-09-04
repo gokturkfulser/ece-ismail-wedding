@@ -6,11 +6,11 @@
 #   ./tools/rsvp-test.sh
 #
 # NOT: Aşağıdaki beklenen hata kodları (invalid_name, invalid_attending,
-# forbidden, no_body) canlıda deploy edilmiş script'e göre yazıldı. Bu repodaki
-# apps-script.gs bunlarla BİREBİR EŞLEŞMİYOR (örn. orada boş gövde hatası
-# "empty_body", "no_body" değil; token kontrolü de repo dosyasında hiç yok).
-# Yani Apps Script editöründeki canlı kod, bu repodaki dosyadan ileride —
-# repo dosyasını canlı koddan senkronize etmeyi unutma.
+# forbidden, no_body) canlıda deploy edilmiş script'e göre yazıldı.
+# apps-script.gs (2026-09-04) bunlarla eşleşecek şekilde güncellendi (no_body +
+# token kontrolü eklendi) — ama bu SADECE REPODAKİ DOSYA. Apps Script
+# editöründeki CANLI kodu senin kendin güncellemen/redeploy etmen gerekiyor,
+# repo dosyasını değiştirmek canlıyı otomatik güncellemiyor.
 #
 # CURL TUZAĞI — -X POST KULLANMA: Apps Script /exec bir POST'u 302 ile
 # script.googleusercontent.com'a yönlendiriyor (asıl işi — Sheet'e yazma vs. —

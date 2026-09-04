@@ -34,7 +34,11 @@ var SETTINGS = {
 
   // Katılım bildirimi son tarihi. config.js → rsvpDeadlineISO ile AYNI olmalı.
   // Frontend kontrolü kullanıcı deneyimi için; gerçek kontrol burada.
-  DEADLINE_ISO: '2027-05-29T23:59:59+03:00',
+  DEADLINE_ISO: '2026-09-18T23:59:59+03:00',
+
+  // Paylaşım anahtarı. config.js → rsvpToken ile AYNI olmalı. Sheet ID GİBİ
+  // GİZLİ DEĞİL (repoda durabilir) — sadece rastgele bot POST'larını ayıklar.
+  RSVP_TOKEN: 'dugun2027',
 
   // Girdi uzunluk sınırları (frontend'i atlayan istekler için)
   MAX_NAME_LEN: 80,
@@ -76,7 +80,7 @@ function doPost(e) {
   try {
     // --- Gövde var mı? ------------------------------------------------------
     if (!e || !e.postData || !e.postData.contents) {
-      return jsonOut({ ok: false, error: 'empty_body' });
+      return jsonOut({ ok: false, error: 'no_body' });
     }
 
     var raw = String(e.postData.contents);
@@ -93,6 +97,13 @@ function doPost(e) {
     }
     if (!data || typeof data !== 'object') {
       return jsonOut({ ok: false, error: 'invalid_payload' });
+    }
+
+    // --- PAYLAŞIM ANAHTARI ---------------------------------------------------
+    // Repoyu (dolayısıyla eski anahtarı) görebilen ama siteyi hiç açmamış
+    // otomatik POST'ları ayıklar. Gizlilik sağlamaz, sadece gürültüyü keser.
+    if (str(data.token) !== SETTINGS.RSVP_TOKEN) {
+      return jsonOut({ ok: false, error: 'forbidden' });
     }
 
     // --- HONEYPOT ----------------------------------------------------------
@@ -254,6 +265,7 @@ function testDoPost() {
   var result = doPost({
     postData: {
       contents: JSON.stringify({
+        token: SETTINGS.RSVP_TOKEN,
         name: 'Test Kullanıcı',
         attending: 'yes',
         guests: 2,
@@ -270,6 +282,7 @@ function testHoneypot() {
   var result = doPost({
     postData: {
       contents: JSON.stringify({
+        token: SETTINGS.RSVP_TOKEN,
         name: 'Bot', attending: 'yes', guests: 1,
         message: '', ref: '', website: 'http://spam.example'
       })

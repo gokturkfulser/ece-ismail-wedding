@@ -127,15 +127,21 @@ WhatsApp ve Twitter link önizlemesi bu etiketleri okuyor. Scraper JavaScript
 
 ```html
 <title>Aybala Ece &amp; İsmail · 12 Haziran 2027</title>
+<link rel="canonical" href="https://KULLANICI.github.io/DEPO/">
 <meta property="og:url"   content="https://KULLANICI.github.io/DEPO/">
-<meta property="og:image" content="https://KULLANICI.github.io/DEPO/assets/img/og.png">
+<meta property="og:image" content="https://KULLANICI.github.io/DEPO/assets/img/og.jpg?v=1">
 ```
 
 `og:url` ve `og:image` **tam URL** olmak zorunda — göreli yol burada çalışmaz.
-`KULLANICI` ve `DEPO`'yu kendi değerlerinle değiştir.
+`KULLANICI` ve `DEPO`'yu kendi değerlerinle değiştir; placeholder kalırsa link
+önizlemesi çıkmaz, sadece çıplak URL görünür. `canonical`, `og:url`,
+`og:image:secure_url` ve `twitter:image` de aynı gerçek adresle senkron olmalı.
 
-> WhatsApp önizlemeyi agresif cache'ler. Değişiklikten sonra önizleme
-> güncellenmezse linkin sonuna `?v=2` ekleyerek paylaş.
+> WhatsApp önizlemeyi agresif cache'ler — hatalı/placeholder bir görseli bir
+> kez denediyse o başarısızlığı da cache'ler. Görseli değiştirdikten sonra
+> `og.jpg` yolunun sonuna `?v=1`, `?v=2`... diye bir sürüm parametresi ekle;
+> eklemezsen WhatsApp günlerce eski (ya da hiç) önizlemeyi göstermeye devam
+> edebilir.
 
 ### 2. `invite.ics`
 
@@ -295,7 +301,7 @@ görselle gelmiyor. Kendi fotoğraflarını **aynı dosya adlarıyla** üzerine 
 | `gate-landscape.webp` | 1920×1080 | Kapı ekranı, masaüstü |
 | `photo-portrait.webp` | 1080×1350 | Üst bölge fotoğrafı, mobil |
 | `photo-landscape.webp` | 1600×1067 | Üst bölge fotoğrafı, masaüstü |
-| `og.png` | 1200×630 | Sosyal medya kartı (WebP değil — scraper uyumu) |
+| `og.jpg` | 1200×630 | Sosyal medya kartı (WebP değil — scraper uyumu; PNG değil — WhatsApp büyük görseli çekmeyebilir) |
 | `favicon-32.png` | 32×32 | Favicon |
 | `apple-touch-icon.png` | 180×180 | iOS ana ekran ikonu |
 | `favicon.svg` | — | Vektör favicon (elle düzenlenebilir) |
@@ -317,9 +323,10 @@ ffmpeg -i foto.jpg -vf "scale=1080:1350:force_original_aspect_ratio=increase,cro
 ffmpeg -i foto.jpg -vf "scale=1600:1067:force_original_aspect_ratio=increase,crop=1600:1067" \
   -c:v libwebp -q:v 80 photo-landscape.webp
 
-# --- OG kartı (PNG, 1200x630) ---
+# --- OG kartı (JPG, 1200x630 — PNG DEĞİL, WhatsApp büyük PNG'yi hiç
+#     çekmeyebilir; 200 KB altını hedefle) ---
 ffmpeg -i kapak.jpg -vf "scale=1200:630:force_original_aspect_ratio=increase,crop=1200:630" \
-  -y og.png
+  -q:v 4 -y og.jpg
 
 # --- İkonlar ---
 ffmpeg -i kapak.jpg -vf "scale=180:180:force_original_aspect_ratio=increase,crop=180:180" -y apple-touch-icon.png
