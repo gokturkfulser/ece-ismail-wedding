@@ -129,7 +129,7 @@ WhatsApp ve Twitter link önizlemesi bu etiketleri okuyor. Scraper JavaScript
 `CONFIG İLE EŞLE` yorumuyla işaretli:
 
 ```html
-<title>Ece &amp; İsmail · 12 Haziran 2027</title>
+<title>Aybala Ece &amp; İsmail · 12 Haziran 2027</title>
 <meta property="og:url"   content="https://KULLANICI.github.io/DEPO/">
 <meta property="og:image" content="https://KULLANICI.github.io/DEPO/assets/img/og.png">
 ```

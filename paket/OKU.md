@@ -16,7 +16,7 @@
    düşürür ve kenarlar titrer. `steps()` hareketi kareli tutar.
 
 ## İsim ve tarih
-Ece ve İsmail — 26 Eylül 2026, Cumartesi. Yer tutucu kalmadı.
+Aybala Ece ve İsmail — 26 Eylül 2026, Cumartesi. Yer tutucu kalmadı.
 
 ## Zaman çizelgesi (saniye)
 0.6 giriş başlar · 4.0 buluşma · 4.2 kalp · 4.4 konfeti · 5.2 yazı

@@ -8,15 +8,15 @@ UID:dugun-2026-09-26@ece-ismail-wedding
 DTSTAMP:20260901T090000Z
 DTSTART:20260926T090000Z
 DTEND:20260926T130000Z
-SUMMARY:Ece & İsmail Düğün Töreni
+SUMMARY:Aybala Ece & İsmail Düğün Töreni
 LOCATION:Park Lamore\, İncek\, Turgut Özal Blv. No:48\, 06830 Gölbaşı/Ankara
-DESCRIPTION:Ece ve İsmail'in düğün töreni.\nMekân: Park Lamore\nSaat: 12:00 – 16:00
+DESCRIPTION:Aybala Ece ve İsmail'in düğün töreni.\nMekân: Park Lamore\nSaat: 12:00 – 16:00
 STATUS:CONFIRMED
 TRANSP:OPAQUE
 BEGIN:VALARM
 TRIGGER:-P1D
 ACTION:DISPLAY
-DESCRIPTION:Yarın Ece & İsmail'in düğünü
+DESCRIPTION:Yarın Aybala Ece & İsmail'in düğünü
 END:VALARM
 END:VEVENT
 END:VCALENDAR

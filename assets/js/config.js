@@ -13,7 +13,7 @@
 window.CONFIG = {
 
   /* ---------------------------------------------------------------- Kişiler */
-  bride: "Ece",
+  bride: "Aybala Ece",
   groom: "İsmail",
   coupleSeparator: "&",
 
@@ -136,7 +136,7 @@ window.CONFIG = {
 
     // Footer
     footerNote: "Sizi aramızda görmek bizi çok mutlu edecek.",
-    footerCredit: "Ece & İsmail · 2026",
+    footerCredit: "Aybala Ece & İsmail · 2026",
 
     // Ses kontrolü (ekran okuyucu etiketleri)
     audioMute: "Müziği kapat",
@@ -152,7 +152,7 @@ window.CONFIG = {
     landscape: "assets/img/gate-landscape.webp",
     width: 1920,
     height: 1080,
-    alt: "Ece ve İsmail"
+    alt: "Aybala Ece ve İsmail"
   },
 
   hero: [
@@ -160,25 +160,25 @@ window.CONFIG = {
       portrait: "assets/img/hero-1-portrait.webp",
       landscape: "assets/img/hero-1-landscape.webp",
       width: 1600, height: 900,
-      alt: "Ece ve İsmail el ele"
+      alt: "Aybala Ece ve İsmail el ele"
     },
     {
       portrait: "assets/img/hero-2-portrait.webp",
       landscape: "assets/img/hero-2-landscape.webp",
       width: 1600, height: 900,
-      alt: "Ece ve İsmail gün batımında"
+      alt: "Aybala Ece ve İsmail gün batımında"
     },
     {
       portrait: "assets/img/hero-3-portrait.webp",
       landscape: "assets/img/hero-3-landscape.webp",
       width: 1600, height: 900,
-      alt: "Ece ve İsmail gülerken"
+      alt: "Aybala Ece ve İsmail gülerken"
     },
     {
       portrait: "assets/img/hero-4-portrait.webp",
       landscape: "assets/img/hero-4-landscape.webp",
       width: 1600, height: 900,
-      alt: "Ece ve İsmail birlikte"
+      alt: "Aybala Ece ve İsmail birlikte"
     }
   ],
 
@@ -187,7 +187,7 @@ window.CONFIG = {
     portrait: "assets/img/photo-portrait.webp",
     landscape: "assets/img/photo-landscape.webp",
     width: 1600, height: 1067,
-    alt: "Ece ve İsmail"
+    alt: "Aybala Ece ve İsmail"
   },
 
   /* -------------------------------------------------------------------- Ses

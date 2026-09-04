@@ -947,6 +947,9 @@ a:hover { color: var(--c-accent-hover); }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Yüzler kadrajın üst kısmına yakın; çok geniş/kısa ekranlarda cover
+     kırpması varsayılan (ortalı) yerine üstten daha az kessin. */
+  object-position: center 22%;
 }
 
 .photo__content {
