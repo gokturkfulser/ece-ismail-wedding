@@ -6,7 +6,6 @@
   --dusk-mid: #5b4a6b;
   --dusk-low: #c98f7d;
   --dusk-glow: #f2c9a8;
-  --ink: #241f33;
   --unit: 4px;              /* tek ölçek kolu: sahnenin tamamı buna bağlı */
 
   position: relative;
@@ -87,10 +86,12 @@
 }
 @keyframes dd-dus { to { transform: translateY(115%) } }
 
-/* yazı */
+/* yazı — karakterlerin başının üstünde, gökyüzünün koyu kısmında durur
+   (bkz. siteye taşınmış hali: assets/css/style.css, bölüm 18) */
 .dugun-davetiye .yazi {
-  position: absolute; left: 0; right: 0; bottom: 7%;
-  text-align: center; color: var(--ink); opacity: 0;
+  position: absolute; left: 0; right: 0;
+  bottom: calc(24% + 138 * var(--unit));
+  text-align: center; color: #f7f1e8; opacity: 0;
   animation: dd-belir 1.4s ease-out 5.2s forwards;
 }
 .dugun-davetiye .isimler {

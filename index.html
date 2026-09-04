@@ -216,6 +216,17 @@
           <span data-text="groom"></span>
         </h2>
       </div>
+
+      <!-- Aşağıda form/detay olduğunu göstermek için — sayfa fotoğraftan
+           sonra boş görünmesin, özellikle mobilde. Tıklanınca bir sonraki
+           bölüme kaydırır; prefers-reduced-motion açıkken zıplama durur ama
+           ok kalır. -->
+      <button class="photo__scroll" type="button" id="photo-scroll" aria-label="Aşağı kaydır">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
+      </button>
     </section>
 
     <!-- ========================================================================

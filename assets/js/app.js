@@ -235,6 +235,30 @@
     media.appendChild(buildPicture(C.photo, { eager: true, priority: 'high' }));
   }
 
+  // Aşağı kaydır ipucu: tıklanınca bir sonraki bölüme kaydırır, kullanıcı
+  // zaten kaydırmaya başlayınca (fotoğraf ekrandan çıkınca) kendini gizler.
+  function setupPhotoScroll() {
+    var photo = $('#photo');
+    var btn = $('#photo-scroll');
+    if (!photo || !btn) return;
+
+    btn.addEventListener('click', function () {
+      var next = photo.nextElementSibling;
+      if (next && next.scrollIntoView) {
+        next.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      }
+    });
+
+    if (!window.IntersectionObserver) return;
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        btn.classList.toggle('is-hidden', entry.intersectionRatio < 0.6);
+      });
+    }, { threshold: 0.6 });
+    io.observe(photo);
+  }
+
 
   /* ==========================================================================
      05. KAPI EKRANI + MÜZİK
@@ -1254,6 +1278,7 @@
 
     setupAudioToggle();
     setupGate();
+    setupPhotoScroll();
 
     setupCountdown();
     setupCalendar();

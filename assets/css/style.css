@@ -561,7 +561,6 @@ a:hover { color: var(--c-accent-hover); }
   /* Zemin aşağı: metin üstte gökyüzünde, çift altta zeminde durur.
      5/6 panelde 24% doğruydu, tam ekranda çift ekranın ortasına düşüyordu. */
   --zemin: 13%;
-  --yazi-alt: 3%;
 }
 
 /* Kapıda dikey bütçe: üst metin bloğu (~470px) + karakter boyu + alt yazı
@@ -844,6 +843,35 @@ a:hover { color: var(--c-accent-hover); }
   font-size: 0.5em;
   color: var(--c-text-invert-soft);
   margin: var(--sp-2) 0;
+}
+
+/* Aşağı kaydır ipucu — sayfa fotoğraftan sonra boş görünmesin, özellikle mobilde */
+.photo__scroll {
+  position: absolute;
+  left: 50%;
+  bottom: var(--sp-5);
+  z-index: var(--z-content);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--c-line-invert);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--c-text-invert);
+  cursor: pointer;
+  transform: translateX(-50%);
+  animation: photo-scroll-bounce 2.2s ease-in-out infinite;
+  transition: opacity var(--dur) var(--ease);
+}
+.photo__scroll.is-hidden { opacity: 0; pointer-events: none; }
+.photo__scroll svg { width: 1.25rem; height: 1.25rem; }
+
+@keyframes photo-scroll-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(6px); }
 }
 
 
@@ -1179,7 +1207,9 @@ a:hover { color: var(--c-accent-hover); }
   --dusk-mid: #5b4a6b;
   --dusk-low: #c98f7d;
   --dusk-glow: #f2c9a8;
-  --ink: #241f33;
+  /* Yazı gökyüzünün koyu üst kısmına biniyor — açık/krem renk gerekiyor,
+     karanlık --ink orada okunmaz olurdu. */
+  --yazi-renk: #f7f1e8;
   /* Tek ölçek kolu: sahnenin tamamı buna bağlı. TAM SAYI px kalmalı.
      Referans 4px'ti; `height: auto` düzeltmesiyle karakterler gerçek
      oranlarına (4 kat uzun) kavuşunca 4px gökyüzüne 114px bırakıyordu.
@@ -1203,10 +1233,6 @@ a:hover { color: var(--c-accent-hover); }
      asagi cekiliyor (bkz. .gate__scene .dugun-davetiye) - metin gokyuzunde,
      cift zeminde kalsin. */
   --zemin: 24%;
-
-  /* Alt yazi bloğunun (isim + tarih) alttan yuksekligi. Zemin degisince
-     bunun da kaymasi gerekiyor, yoksa yazi karakterlerin ayagina biner. */
-  --yazi-alt: 7%;
 
   position: relative;
   width: min(94vw, 640px);
@@ -1327,10 +1353,14 @@ a:hover { color: var(--c-accent-hover); }
 }
 @keyframes dd-dus { to { transform: translateY(var(--dus-mesafe)) } }
 
-/* yazı */
+/* yazı — karakterlerin BAŞININ ÜSTÜNDE, gökyüzünün koyu kısmında durur
+   (kalp 118 birimde; yazı onun biraz üstünden başlasın diye 138 birim).
+   Zemin + birim tabanlı olduğu için --zemin/--unit her bağlamda (5/6 panel
+   ya da kapıda tam ekran) değişse de yazı hep başların üstünde kalır. */
 .dugun-davetiye .yazi {
-  position: absolute; left: 0; right: 0; bottom: var(--yazi-alt);
-  text-align: center; color: var(--ink); opacity: 0;
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--zemin) + 138 * var(--unit));
+  text-align: center; color: var(--yazi-renk); opacity: 0;
   animation: dd-belir 1.4s ease-out 5.2s forwards;
 }
 .dugun-davetiye .isimler {
@@ -1391,6 +1421,8 @@ a:hover { color: var(--c-accent-hover); }
   .particle { animation: none; opacity: 0; }
 
   [data-reveal] { opacity: 1; transform: none; transition: none; }
+
+  .photo__scroll { animation: none; }
 
   .btn:active,
   .audio-toggle:active { transform: none; }
