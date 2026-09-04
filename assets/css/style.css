@@ -424,6 +424,41 @@ a:hover { color: var(--c-accent-hover); }
   border: 0;
 }
 
+/* Kenar çiçek süslemesi — sadece bunu isteyen bölümlere `section--floral` ile
+   eklenir (şu an: Davetimiz + Düğün Töreni). Tamamen dekoratif: DOM'a eleman
+   eklemeden ::before/::after ile inline SVG, pointer-events yok, içeriğin
+   ARKASINDA durur (z-index 0 < .section__inner). Davetiyenin çiçek temasına
+   gönderme ama kopyası değil — sitenin kendi paletiyle (yeşil + toz mavi)
+   yeniden çizildi. Tek bir sarmaşık "karo"su (70×240, yoğunluk ilk halinde)
+   dikeyde kusursuz tekrar edecek şekilde çizildi (gövde üstte ve altta aynı
+   x'te başlar/biter) ve `repeat-y` ile kenar boyunca akıyor. Bölümün TAM
+   yüksekliğini KAPLAMIYOR — üstte/altta bilinçli boşluk (--sp-7) var, yoksa
+   bir sonraki bölümün sarmaşığıyla birleşip kesintisiz/uçsuz görünüyordu. */
+.section--floral::before,
+.section--floral::after {
+  content: "";
+  position: absolute;
+  top: var(--sp-7);
+  bottom: var(--sp-7);
+  width: 60px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 240'%3E%3Cg fill='none' stroke='%236e8b72' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M20,0 C10,25 28,45 18,70 C8,92 26,115 16,140 C6,162 24,185 18,210 C13,225 22,232 20,240'/%3E%3C/g%3E%3Cg fill='%238ba084'%3E%3Cellipse cx='12' cy='14' rx='8' ry='3.6' transform='rotate(-40 12 14)'/%3E%3Cellipse cx='26' cy='34' rx='8.5' ry='3.6' transform='rotate(25 26 34)'/%3E%3Cellipse cx='10' cy='58' rx='7.5' ry='3.4' transform='rotate(-55 10 58)'/%3E%3Cellipse cx='24' cy='82' rx='8' ry='3.6' transform='rotate(30 24 82)'/%3E%3Cellipse cx='9' cy='104' rx='7.5' ry='3.3' transform='rotate(-45 9 104)'/%3E%3Cellipse cx='22' cy='128' rx='8' ry='3.5' transform='rotate(20 22 128)'/%3E%3Cellipse cx='8' cy='150' rx='7.2' ry='3.2' transform='rotate(-50 8 150)'/%3E%3Cellipse cx='21' cy='172' rx='7.8' ry='3.4' transform='rotate(28 21 172)'/%3E%3Cellipse cx='10' cy='196' rx='7.2' ry='3.2' transform='rotate(-40 10 196)'/%3E%3Cellipse cx='20' cy='220' rx='7' ry='3.1' transform='rotate(18 20 220)'/%3E%3C/g%3E%3Cg fill='%23c3d0d6'%3E%3Ccircle cx='19' cy='46' r='3.4'/%3E%3Ccircle cx='23' cy='50' r='2.7'/%3E%3Ccircle cx='15' cy='51' r='2.4'/%3E%3Ccircle cx='18' cy='55' r='2.2'/%3E%3C/g%3E%3Cg fill='%23b7c8cf'%3E%3Ccircle cx='15' cy='140' r='3.2'/%3E%3Ccircle cx='19' cy='144' r='2.6'/%3E%3Ccircle cx='11' cy='144' r='2.2'/%3E%3C/g%3E%3Cg fill='%23a8b8c2'%3E%3Ccircle cx='19' cy='208' r='3'/%3E%3Ccircle cx='23' cy='212' r='2.4'/%3E%3Ccircle cx='15' cy='212' r='2.1'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-y;
+  background-size: 60px 206px;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
+}
+.section--floral::before { left: 0; }
+.section--floral::after  { right: 0; transform: scaleX(-1); }
+
+@media (min-width: 48rem) {
+  .section--floral::before,
+  .section--floral::after {
+    width: 84px;
+    background-size: 84px 288px;
+  }
+}
+
 
 /* =============================================================================
    07. KAPI EKRANI (GATE)
