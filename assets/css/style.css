@@ -424,27 +424,28 @@ a:hover { color: var(--c-accent-hover); }
   border: 0;
 }
 
-/* Kenar çiçek süslemesi — sadece bunu isteyen bölümlere `section--floral` ile
+/* Köşe çiçek demeti — sadece bunu isteyen bölümlere `section--floral` ile
    eklenir (şu an: Davetimiz + Düğün Töreni). Tamamen dekoratif: DOM'a eleman
    eklemeden ::before/::after ile inline SVG, pointer-events yok, içeriğin
-   ARKASINDA durur (z-index 0 < .section__inner). Davetiyenin çiçek temasına
-   gönderme ama kopyası değil — sitenin kendi paletiyle (yeşil + toz mavi)
-   yeniden çizildi. Tek bir sarmaşık "karo"su (70×240, yoğunluk ilk halinde)
-   dikeyde kusursuz tekrar edecek şekilde çizildi (gövde üstte ve altta aynı
-   x'te başlar/biter) ve `repeat-y` ile kenar boyunca akıyor. Bölümün TAM
-   yüksekliğini KAPLAMIYOR — üstte/altta bilinçli boşluk (--sp-7) var, yoksa
-   bir sonraki bölümün sarmaşığıyla birleşip kesintisiz/uçsuz görünüyordu. */
+   ARKASINDA durur (z-index 0 < .section__inner). Davetiyenin bol çiçekli
+   hidrangea köşelerine gönderme — AMA KOPYASI DEĞİL: o illüstrasyon bir
+   şablon/tasarımcı ürünü olabileceği için parçalarını almadık, buradaki her
+   yaprak/çiçek sıfırdan çizildi. Sadece genel his (mavi-lavanta çiçek +
+   yeşillik, yoğun küme) ve renk paleti davetiyeye yakın seçildi. Dal köşeden
+   başlığa doğru uzanıp birkaç çiçek kümesiyle devam ediyor ki metnin daha
+   çok "etrafında" hissi versin; köşede sabitlendiği için yine de bir sonraki
+   bölümün demetiyle birleşip kenar boyunca uzayan bir çizgi oluşturmuyor. */
 .section--floral::before,
 .section--floral::after {
   content: "";
   position: absolute;
-  top: var(--sp-7);
-  bottom: var(--sp-7);
-  width: 60px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 240'%3E%3Cg fill='none' stroke='%236e8b72' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M20,0 C10,25 28,45 18,70 C8,92 26,115 16,140 C6,162 24,185 18,210 C13,225 22,232 20,240'/%3E%3C/g%3E%3Cg fill='%238ba084'%3E%3Cellipse cx='12' cy='14' rx='8' ry='3.6' transform='rotate(-40 12 14)'/%3E%3Cellipse cx='26' cy='34' rx='8.5' ry='3.6' transform='rotate(25 26 34)'/%3E%3Cellipse cx='10' cy='58' rx='7.5' ry='3.4' transform='rotate(-55 10 58)'/%3E%3Cellipse cx='24' cy='82' rx='8' ry='3.6' transform='rotate(30 24 82)'/%3E%3Cellipse cx='9' cy='104' rx='7.5' ry='3.3' transform='rotate(-45 9 104)'/%3E%3Cellipse cx='22' cy='128' rx='8' ry='3.5' transform='rotate(20 22 128)'/%3E%3Cellipse cx='8' cy='150' rx='7.2' ry='3.2' transform='rotate(-50 8 150)'/%3E%3Cellipse cx='21' cy='172' rx='7.8' ry='3.4' transform='rotate(28 21 172)'/%3E%3Cellipse cx='10' cy='196' rx='7.2' ry='3.2' transform='rotate(-40 10 196)'/%3E%3Cellipse cx='20' cy='220' rx='7' ry='3.1' transform='rotate(18 20 220)'/%3E%3C/g%3E%3Cg fill='%23c3d0d6'%3E%3Ccircle cx='19' cy='46' r='3.4'/%3E%3Ccircle cx='23' cy='50' r='2.7'/%3E%3Ccircle cx='15' cy='51' r='2.4'/%3E%3Ccircle cx='18' cy='55' r='2.2'/%3E%3C/g%3E%3Cg fill='%23b7c8cf'%3E%3Ccircle cx='15' cy='140' r='3.2'/%3E%3Ccircle cx='19' cy='144' r='2.6'/%3E%3Ccircle cx='11' cy='144' r='2.2'/%3E%3C/g%3E%3Cg fill='%23a8b8c2'%3E%3Ccircle cx='19' cy='208' r='3'/%3E%3Ccircle cx='23' cy='212' r='2.4'/%3E%3Ccircle cx='15' cy='212' r='2.1'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: repeat-y;
-  background-size: 60px 206px;
-  opacity: 0.9;
+  top: var(--sp-3);
+  width: 200px;
+  height: 169px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 220'%3E%3Cg fill='none' stroke='%236e8b72' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6,6 C24,42 20,72 48,92 C70,106 82,110 100,106'/%3E%3Cpath d='M100,106 C120,102 140,108 160,120'/%3E%3Cpath d='M6,6 C36,20 50,16 74,30'/%3E%3Cpath d='M6,6 C16,32 42,36 60,54'/%3E%3Cpath d='M48,92 C62,98 78,96 92,86'/%3E%3Cpath d='M160,120 C176,128 188,140 192,158'/%3E%3C/g%3E%3Cg fill='%237f9a80'%3E%3Cellipse cx='20' cy='22' rx='12' ry='5' transform='rotate(-30 20 22)'/%3E%3Cellipse cx='44' cy='14' rx='11' ry='4.6' transform='rotate(10 44 14)'/%3E%3Cellipse cx='62' cy='30' rx='11.5' ry='4.8' transform='rotate(-15 62 30)'/%3E%3Cellipse cx='26' cy='48' rx='11' ry='4.6' transform='rotate(-55 26 48)'/%3E%3Cellipse cx='46' cy='64' rx='12' ry='5' transform='rotate(20 46 64)'/%3E%3Cellipse cx='66' cy='88' rx='11.5' ry='4.8' transform='rotate(-10 66 88)'/%3E%3Cellipse cx='86' cy='102' rx='11' ry='4.6' transform='rotate(30 86 102)'/%3E%3Cellipse cx='110' cy='98' rx='10.5' ry='4.4' transform='rotate(-20 110 98)'/%3E%3Cellipse cx='130' cy='112' rx='10.5' ry='4.4' transform='rotate(18 130 112)'/%3E%3Cellipse cx='150' cy='126' rx='10' ry='4.2' transform='rotate(-25 150 126)'/%3E%3Cellipse cx='172' cy='134' rx='9.5' ry='4' transform='rotate(20 172 134)'/%3E%3Cellipse cx='184' cy='150' rx='9' ry='3.8' transform='rotate(-15 184 150)'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='10' cy='8' r='9'/%3E%3Ccircle cx='24' cy='4' r='7.6'/%3E%3Ccircle cx='2' cy='18' r='7.6'/%3E%3Ccircle cx='18' cy='18' r='7'/%3E%3Ccircle cx='32' cy='12' r='6.4'/%3E%3Ccircle cx='8' cy='28' r='6.4'/%3E%3Ccircle cx='26' cy='26' r='6'/%3E%3Ccircle cx='14' cy='34' r='5.4'/%3E%3C/g%3E%3Cg fill='%23c7d3e6'%3E%3Ccircle cx='16' cy='10' r='3.2'/%3E%3Ccircle cx='26' cy='8' r='2.8'/%3E%3Ccircle cx='10' cy='20' r='2.8'/%3E%3Ccircle cx='20' cy='24' r='2.4'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='56' cy='28' r='7.6'/%3E%3Ccircle cx='66' cy='22' r='6.6'/%3E%3Ccircle cx='48' cy='34' r='6.4'/%3E%3Ccircle cx='62' cy='38' r='5.8'/%3E%3Ccircle cx='72' cy='32' r='5.2'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='46' cy='62' r='7'/%3E%3Ccircle cx='56' cy='56' r='6'/%3E%3Ccircle cx='38' cy='68' r='5.8'/%3E%3Ccircle cx='54' cy='72' r='5.2'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='88' cy='100' r='6.4'/%3E%3Ccircle cx='96' cy='106' r='5.4'/%3E%3Ccircle cx='82' cy='108' r='5'/%3E%3C/g%3E%3Cg fill='%23c7d3e6'%3E%3Ccircle cx='128' cy='108' r='5.6'/%3E%3Ccircle cx='136' cy='114' r='4.8'/%3E%3Ccircle cx='122' cy='116' r='4.4'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='168' cy='122' r='6'/%3E%3Ccircle cx='176' cy='128' r='5'/%3E%3Ccircle cx='162' cy='130' r='4.6'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='190' cy='156' r='5.2'/%3E%3Ccircle cx='197' cy='162' r='4.3'/%3E%3Ccircle cx='184' cy='164' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: top;
   pointer-events: none;
   z-index: 0;
 }
@@ -454,8 +455,8 @@ a:hover { color: var(--c-accent-hover); }
 @media (min-width: 48rem) {
   .section--floral::before,
   .section--floral::after {
-    width: 84px;
-    background-size: 84px 288px;
+    width: 300px;
+    height: 254px;
   }
 }
 
