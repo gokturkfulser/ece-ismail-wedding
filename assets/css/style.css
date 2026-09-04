@@ -424,40 +424,52 @@ a:hover { color: var(--c-accent-hover); }
   border: 0;
 }
 
-/* Köşe çiçek demeti — sadece bunu isteyen bölümlere `section--floral` ile
-   eklenir (şu an: Davetimiz + Düğün Töreni). Tamamen dekoratif: DOM'a eleman
-   eklemeden ::before/::after ile inline SVG, pointer-events yok, içeriğin
-   ARKASINDA durur (z-index 0 < .section__inner). Davetiyenin bol çiçekli
+/* Çelenk çiçek süslemesi — sadece bunu isteyen bölümlere `section--floral`
+   ile eklenir (şu an: Davetimiz + Düğün Töreni). Tamamen dekoratif: DOM'a
+   eleman eklemeden ::before/::after ile inline SVG, pointer-events yok,
+   içeriğin ARKASINDA durur (z-index 0 < başlık). Davetiyenin bol çiçekli
    hidrangea köşelerine gönderme — AMA KOPYASI DEĞİL: o illüstrasyon bir
    şablon/tasarımcı ürünü olabileceği için parçalarını almadık, buradaki her
    yaprak/çiçek sıfırdan çizildi. Sadece genel his (mavi-lavanta çiçek +
-   yeşillik, yoğun küme) ve renk paleti davetiyeye yakın seçildi. Dal köşeden
-   başlığa doğru uzanıp birkaç çiçek kümesiyle devam ediyor ki metnin daha
-   çok "etrafında" hissi versin; köşede sabitlendiği için yine de bir sonraki
-   bölümün demetiyle birleşip kenar boyunca uzayan bir çizgi oluşturmuyor. */
-.section--floral::before,
-.section--floral::after {
+   yeşillik, yoğun küme) ve renk paleti davetiyeye yakın seçildi.
+
+   `.section__inner`e (sabit max-width, ortalı) bağlı — `.section`in kendisine
+   değil. Böylece iki yarı her ekran genişliğinde TAM ORTADA birleşiyor:
+   `.section` viewport kadar geniş olabilir ama içerik sütunu hep aynı
+   max-width'te ortalanıyor, iki %50 yarı da o sütunun ortasında buluşuyor. */
+.section--floral .section__title { margin-top: 130px; }
+
+.section--floral .section__inner {
+  position: relative;
+}
+.section--floral .section__inner::before,
+.section--floral .section__inner::after {
   content: "";
   position: absolute;
-  top: var(--sp-3);
-  width: 200px;
-  height: 169px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 220'%3E%3Cg fill='none' stroke='%236e8b72' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6,6 C24,42 20,72 48,92 C70,106 82,110 100,106'/%3E%3Cpath d='M100,106 C120,102 140,108 160,120'/%3E%3Cpath d='M6,6 C36,20 50,16 74,30'/%3E%3Cpath d='M6,6 C16,32 42,36 60,54'/%3E%3Cpath d='M48,92 C62,98 78,96 92,86'/%3E%3Cpath d='M160,120 C176,128 188,140 192,158'/%3E%3C/g%3E%3Cg fill='%237f9a80'%3E%3Cellipse cx='20' cy='22' rx='12' ry='5' transform='rotate(-30 20 22)'/%3E%3Cellipse cx='44' cy='14' rx='11' ry='4.6' transform='rotate(10 44 14)'/%3E%3Cellipse cx='62' cy='30' rx='11.5' ry='4.8' transform='rotate(-15 62 30)'/%3E%3Cellipse cx='26' cy='48' rx='11' ry='4.6' transform='rotate(-55 26 48)'/%3E%3Cellipse cx='46' cy='64' rx='12' ry='5' transform='rotate(20 46 64)'/%3E%3Cellipse cx='66' cy='88' rx='11.5' ry='4.8' transform='rotate(-10 66 88)'/%3E%3Cellipse cx='86' cy='102' rx='11' ry='4.6' transform='rotate(30 86 102)'/%3E%3Cellipse cx='110' cy='98' rx='10.5' ry='4.4' transform='rotate(-20 110 98)'/%3E%3Cellipse cx='130' cy='112' rx='10.5' ry='4.4' transform='rotate(18 130 112)'/%3E%3Cellipse cx='150' cy='126' rx='10' ry='4.2' transform='rotate(-25 150 126)'/%3E%3Cellipse cx='172' cy='134' rx='9.5' ry='4' transform='rotate(20 172 134)'/%3E%3Cellipse cx='184' cy='150' rx='9' ry='3.8' transform='rotate(-15 184 150)'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='10' cy='8' r='9'/%3E%3Ccircle cx='24' cy='4' r='7.6'/%3E%3Ccircle cx='2' cy='18' r='7.6'/%3E%3Ccircle cx='18' cy='18' r='7'/%3E%3Ccircle cx='32' cy='12' r='6.4'/%3E%3Ccircle cx='8' cy='28' r='6.4'/%3E%3Ccircle cx='26' cy='26' r='6'/%3E%3Ccircle cx='14' cy='34' r='5.4'/%3E%3C/g%3E%3Cg fill='%23c7d3e6'%3E%3Ccircle cx='16' cy='10' r='3.2'/%3E%3Ccircle cx='26' cy='8' r='2.8'/%3E%3Ccircle cx='10' cy='20' r='2.8'/%3E%3Ccircle cx='20' cy='24' r='2.4'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='56' cy='28' r='7.6'/%3E%3Ccircle cx='66' cy='22' r='6.6'/%3E%3Ccircle cx='48' cy='34' r='6.4'/%3E%3Ccircle cx='62' cy='38' r='5.8'/%3E%3Ccircle cx='72' cy='32' r='5.2'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='46' cy='62' r='7'/%3E%3Ccircle cx='56' cy='56' r='6'/%3E%3Ccircle cx='38' cy='68' r='5.8'/%3E%3Ccircle cx='54' cy='72' r='5.2'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='88' cy='100' r='6.4'/%3E%3Ccircle cx='96' cy='106' r='5.4'/%3E%3Ccircle cx='82' cy='108' r='5'/%3E%3C/g%3E%3Cg fill='%23c7d3e6'%3E%3Ccircle cx='128' cy='108' r='5.6'/%3E%3Ccircle cx='136' cy='114' r='4.8'/%3E%3Ccircle cx='122' cy='116' r='4.4'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='168' cy='122' r='6'/%3E%3Ccircle cx='176' cy='128' r='5'/%3E%3Ccircle cx='162' cy='130' r='4.6'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='190' cy='156' r='5.2'/%3E%3Ccircle cx='197' cy='162' r='4.3'/%3E%3Ccircle cx='184' cy='164' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  top: 0;
+  width: 50%;
+  height: 110px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 140'%3E%3Cg fill='none' stroke='%236e8b72' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M10,10 C50,8 80,32 120,40 C160,48 190,30 225,38 C255,45 280,58 308,72'/%3E%3Cpath d='M10,10 C30,26 40,40 36,58'/%3E%3Cpath d='M120,40 C130,52 128,64 116,74'/%3E%3C/g%3E%3Cg fill='%237f9a80'%3E%3Cellipse cx='24' cy='14' rx='11' ry='4.6' transform='rotate(-20 24 14)'/%3E%3Cellipse cx='18' cy='32' rx='10' ry='4.2' transform='rotate(-70 18 32)'/%3E%3Cellipse cx='50' cy='18' rx='10.5' ry='4.4' transform='rotate(10 50 18)'/%3E%3Cellipse cx='78' cy='28' rx='10.5' ry='4.4' transform='rotate(-15 78 28)'/%3E%3Cellipse cx='30' cy='50' rx='9.5' ry='4' transform='rotate(-45 30 50)'/%3E%3Cellipse cx='106' cy='38' rx='10' ry='4.2' transform='rotate(20 106 38)'/%3E%3Cellipse cx='128' cy='52' rx='9' ry='3.8' transform='rotate(-60 128 52)'/%3E%3Cellipse cx='150' cy='46' rx='9.5' ry='4' transform='rotate(15 150 46)'/%3E%3Cellipse cx='178' cy='34' rx='9' ry='3.8' transform='rotate(-20 178 34)'/%3E%3Cellipse cx='202' cy='36' rx='8.5' ry='3.6' transform='rotate(20 202 36)'/%3E%3Cellipse cx='238' cy='42' rx='8.5' ry='3.6' transform='rotate(-15 238 42)'/%3E%3Cellipse cx='264' cy='52' rx='8' ry='3.4' transform='rotate(20 264 52)'/%3E%3Cellipse cx='292' cy='64' rx='7.5' ry='3.2' transform='rotate(-20 292 64)'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='10' cy='8' r='9'/%3E%3Ccircle cx='24' cy='4' r='7.6'/%3E%3Ccircle cx='2' cy='18' r='7.6'/%3E%3Ccircle cx='18' cy='18' r='7'/%3E%3Ccircle cx='32' cy='12' r='6.4'/%3E%3Ccircle cx='8' cy='28' r='6.4'/%3E%3Ccircle cx='26' cy='26' r='6'/%3E%3Ccircle cx='14' cy='34' r='5.4'/%3E%3C/g%3E%3Cg fill='%23c7d3e6'%3E%3Ccircle cx='16' cy='10' r='3.2'/%3E%3Ccircle cx='26' cy='8' r='2.8'/%3E%3Ccircle cx='10' cy='20' r='2.8'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='62' cy='20' r='7.2'/%3E%3Ccircle cx='72' cy='15' r='6.2'/%3E%3Ccircle cx='54' cy='26' r='6'/%3E%3Ccircle cx='68' cy='30' r='5.4'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='98' cy='34' r='6.6'/%3E%3Ccircle cx='108' cy='28' r='5.6'/%3E%3Ccircle cx='90' cy='40' r='5.4'/%3E%3C/g%3E%3Cg fill='%23c7d3e6'%3E%3Ccircle cx='134' cy='46' r='5.6'/%3E%3Ccircle cx='142' cy='52' r='4.8'/%3E%3Ccircle cx='126' cy='52' r='4.4'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='168' cy='32' r='5.4'/%3E%3Ccircle cx='176' cy='38' r='4.6'/%3E%3Ccircle cx='160' cy='38' r='4.2'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='196' cy='34' r='5'/%3E%3Ccircle cx='204' cy='40' r='4.2'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='228' cy='40' r='5'/%3E%3Ccircle cx='236' cy='46' r='4.2'/%3E%3C/g%3E%3Cg fill='%23c7d3e6'%3E%3Ccircle cx='258' cy='50' r='4.6'/%3E%3Ccircle cx='266' cy='56' r='3.8'/%3E%3C/g%3E%3Cg fill='%23aebfd8'%3E%3Ccircle cx='286' cy='62' r='4.4'/%3E%3Ccircle cx='294' cy='68' r='3.6'/%3E%3C/g%3E%3Cg fill='%238fa3c2'%3E%3Ccircle cx='308' cy='72' r='4'/%3E%3Ccircle cx='314' cy='78' r='3.2'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-size: contain;
-  background-position: top;
   pointer-events: none;
   z-index: 0;
 }
-.section--floral::before { left: 0; }
-.section--floral::after  { right: 0; transform: scaleX(-1); }
+.section--floral .section__inner::before {
+  left: 0;
+  background-position: top left;
+  background-size: contain;
+}
+.section--floral .section__inner::after {
+  right: 0;
+  background-position: top right;
+  background-size: contain;
+  transform: scaleX(-1);
+}
 
 @media (min-width: 48rem) {
-  .section--floral::before,
-  .section--floral::after {
-    width: 300px;
-    height: 254px;
-  }
+  .section--floral .section__title { margin-top: 150px; }
+  .section--floral .section__inner::before,
+  .section--floral .section__inner::after { height: 130px; }
 }
 
 
