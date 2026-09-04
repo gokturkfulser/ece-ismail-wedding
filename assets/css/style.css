@@ -9,25 +9,24 @@
      05. Butonlar & bağlantılar
      06. Bölüm iskeleti (section / başlık)
      07. Kapı ekranı (gate)
-     08. Hero + slideshow + Ken Burns
-     09. Ses kontrolü (mute butonu)
-     10. Davetiye metni
-     11. Etkinlik detayı
-     12. Geri sayım
-     13. Galeri
-     14. RSVP formu
-     15. Konum (harita)
-     16. Footer
-     17. Partikül katmanı
-     18. Scroll reveal
-     19. Piksel davetiye sahnesi (.dugun-davetiye — kapsüllü)
-     20. prefers-reduced-motion
+     08. Ses kontrolü (mute butonu)
+     09. Davetiye metni
+     10. Etkinlik detayı
+     11. Geri sayım
+     12. Fotoğraf
+     13. RSVP formu
+     14. Konum (harita)
+     15. Footer
+     16. Partikül katmanı
+     17. Scroll reveal
+     18. Piksel davetiye sahnesi (.dugun-davetiye — kapsüllü)
+     19. prefers-reduced-motion
 
    KURAL: Sadece `transform` ve `opacity` animasyonu var.
    width/height/top/left/filter/box-shadow ANİMASYONU YOK.
    Tüm renk/spacing/font değerleri :root altındaki custom property'lerde.
 
-   TEK İSTİSNA: 19. bölüm (piksel davetiye sahnesi). Pixel art bileşeni kendi
+   TEK İSTİSNA: 18. bölüm (piksel davetiye sahnesi). Pixel art bileşeni kendi
    token'larını `.dugun-davetiye` üzerinde tutar ve `dd-ziplama` margin-bottom
    animasyonu kullanır — gerekçesi bölümün kendi başlığında yazıyor.
    ============================================================================= */
@@ -162,12 +161,8 @@
   --dur:        320ms;
   --dur-slow:   700ms;
   --dur-gate:   900ms;   /* kapı fade-out */
-  --dur-fade:   1600ms;  /* hero crossfade */
   --ease:       cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
-
-  --kb-scale-from: 1;
-  --kb-scale-to:   1.12;
 
   /* --- Katman sırası --- */
   --z-particles: 1;
@@ -238,7 +233,7 @@ a:hover { color: var(--c-accent-hover); }
   outline-offset: var(--focus-offset);
 }
 .gate :focus-visible,
-.hero :focus-visible,
+.photo :focus-visible,
 .footer :focus-visible {
   outline-color: var(--c-text-invert);
 }
@@ -278,12 +273,6 @@ a:hover { color: var(--c-accent-hover); }
   padding: var(--sp-7) var(--sp-5);
   text-align: center;
   color: var(--c-text-soft);
-}
-
-/* Tam ekran bölümler: 100vh fallback, sonra 100dvh */
-.fullscreen {
-  min-height: 100vh;
-  min-height: 100dvh;
 }
 
 /* Fotoğraf üstü okunabilirlik perdesi */
@@ -642,123 +631,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   08. HERO + SLIDESHOW + KEN BURNS
-   ============================================================================= */
-
-.hero {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background-color: var(--c-bg-dark);
-  color: var(--c-text-invert);
-}
-
-.hero__slides {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-.hero__slide {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  opacity: 0;
-  transition: opacity var(--dur-fade) var(--ease);
-  will-change: opacity;
-}
-.hero__slide.is-active { opacity: 1; }
-
-.hero__slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform-origin: center center;
-  /* Ken Burns: süre JS tarafından --kb-dur ile slayt başına atanır (20-26s) */
-  animation: ken-burns var(--kb-dur, 22s) ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-@keyframes ken-burns {
-  from { transform: scale(var(--kb-scale-from)) translate3d(0, 0, 0); }
-  to   { transform: scale(var(--kb-scale-to)) translate3d(var(--kb-x, 0), var(--kb-y, 0), 0); }
-}
-
-.hero__content {
-  position: relative;
-  z-index: var(--z-content);
-  text-align: center;
-  padding: var(--sp-9) var(--sp-5) var(--sp-8);
-  max-width: 34rem;
-}
-
-.hero__names {
-  font-size: var(--fs-3xl);
-  margin: 0 0 var(--sp-4);
-}
-@media (min-width: 48rem) {
-  .hero__names { font-size: var(--fs-4xl); }
-}
-
-.hero__sep {
-  display: block;
-  font-size: 0.5em;
-  color: var(--c-text-invert-soft);
-  margin: var(--sp-2) 0;
-}
-
-.hero__meta {
-  font-size: var(--fs-sm);
-  letter-spacing: var(--ls-wider);
-  text-transform: uppercase;
-  color: var(--c-text-invert-soft);
-  margin: 0;
-}
-.hero__meta span { display: block; }
-.hero__meta span + span { margin-top: var(--sp-2); }
-
-.hero__venue {
-  font-family: var(--font-display);
-  font-size: var(--fs-md);
-  letter-spacing: var(--ls-wide);
-  text-transform: none;
-  color: var(--c-text-invert);
-}
-
-/* Aşağı kaydır ipucu — sayfa hero'dan sonra boş görünmesin, özellikle mobilde */
-.hero__scroll {
-  position: absolute;
-  left: 50%;
-  bottom: var(--sp-5);
-  z-index: var(--z-content);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  padding: 0;
-  border: 1px solid var(--c-line-invert);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--c-text-invert);
-  cursor: pointer;
-  transform: translateX(-50%);
-  animation: hero-scroll-bounce 2.2s ease-in-out infinite;
-  transition: opacity var(--dur-fade) var(--ease);
-}
-.hero__scroll.is-hidden { opacity: 0; pointer-events: none; }
-.hero__scroll svg { width: 1.25rem; height: 1.25rem; }
-
-@keyframes hero-scroll-bounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%      { transform: translateX(-50%) translateY(6px); }
-}
-
-
-/* =============================================================================
-   09. SES KONTROLÜ
+   08. SES KONTROLÜ
    ============================================================================= */
 
 .audio-toggle {
@@ -791,7 +664,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   10. DAVETİYE METNİ
+   09. DAVETİYE METNİ
    ============================================================================= */
 
 .invite__greeting {
@@ -811,7 +684,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   11. ETKİNLİK DETAYI
+   10. ETKİNLİK DETAYI
    ============================================================================= */
 
 .details__list {
@@ -869,7 +742,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   12. GERİ SAYIM
+   11. GERİ SAYIM
    ============================================================================= */
 
 .countdown {
@@ -918,11 +791,10 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   13. FOTOĞRAF
+   12. FOTOĞRAF
    -----------------------------------------------------------------------------
-   Hero'nun hemen altında tek görsel banner (CONFIG.photo): fotoğraf tam
-   genişlik arka planda, isimler ortada üstüne biniyor — hero ile aynı
-   media+scrim+content deseni, sadece slaytsız ve daha kısa.
+   Kapıdan sonra sayfanın en üstündeki tek görsel banner (CONFIG.photo):
+   fotoğraf tam genişlik arka planda, isimler ortada üstüne biniyor.
    ============================================================================= */
 
 .photo {
@@ -976,7 +848,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   14. RSVP FORMU
+   13. RSVP FORMU
    ============================================================================= */
 
 .rsvp__intro {
@@ -1143,7 +1015,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   15. KONUM (HARİTA)
+   14. KONUM (HARİTA)
    ============================================================================= */
 
 .map {
@@ -1175,7 +1047,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   16. FOOTER
+   15. FOOTER
    ============================================================================= */
 
 .footer {
@@ -1207,7 +1079,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   17. PARTİKÜL KATMANI
+   16. PARTİKÜL KATMANI
    -----------------------------------------------------------------------------
    En fazla 12 element. Süre/gecikme/x-sapması JS'te rastgele atanır,
    negatif animation-delay ile sayfa açılışında dağılmış başlarlar.
@@ -1242,7 +1114,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   18. SCROLL REVEAL
+   17. SCROLL REVEAL
    -----------------------------------------------------------------------------
    IntersectionObserver `data-reveal` elemanlarına .is-visible ekler,
    sonra gözlemden çıkarır (tek seferlik).
@@ -1264,7 +1136,7 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   19. PİKSEL DAVETİYE SAHNESİ
+   18. PİKSEL DAVETİYE SAHNESİ
    -----------------------------------------------------------------------------
    Kapsüllü bileşen: her kural `.dugun-davetiye` altında. Global'e taşımayın —
    sahnenin kendi renk/ölçek token'ları var ve site token'larıyla çakışmamalı.
@@ -1507,28 +1379,23 @@ a:hover { color: var(--c-accent-hover); }
 
 
 /* =============================================================================
-   20. prefers-reduced-motion
+   19. prefers-reduced-motion
    -----------------------------------------------------------------------------
-   Ken Burns, partiküller ve reveal animasyonları kapatılır.
+   Partiküller ve reveal animasyonları kapatılır.
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-
-  .hero__slide img { animation: none; transform: none; }
 
   .particles { display: none; }
   .particle { animation: none; opacity: 0; }
 
   [data-reveal] { opacity: 1; transform: none; transition: none; }
 
-  .hero__scroll { animation: none; }
-
   .btn:active,
   .audio-toggle:active { transform: none; }
 
-  /* Crossfade ve kapı geçişi kalır ama çok kısaltılır */
-  .hero__slide { transition-duration: 200ms; }
+  /* Kapı geçişi kalır ama çok kısaltılır */
   .gate { transition-duration: 200ms; }
 
   .spinner { animation-duration: 2s; }

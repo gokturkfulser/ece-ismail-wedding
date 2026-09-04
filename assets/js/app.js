@@ -8,18 +8,17 @@
      01. Yardımcılar
      02. Kişiye özel link (?d= / ?k=)
      03. Metin doldurma ([data-text])
-     04. Görseller (kapı / hero / fotoğraf)
+     04. Görseller (kapı / fotoğraf)
      05. Kapı ekranı + müzik
-     06. Hero slideshow + Ken Burns
-     07. Geri sayım
-     08. Takvime ekle
-     09. Konum (harita + dış linkler)
-     10. RSVP
-     11. Scroll reveal
-     12. Partiküller
-     13. Piksel davetiye sahnesi
-     14. Debug paneli (?debug=1)
-     15. Başlat
+     06. Geri sayım
+     07. Takvime ekle
+     08. Konum (harita + dış linkler)
+     09. RSVP
+     10. Scroll reveal
+     11. Partiküller
+     12. Piksel davetiye sahnesi
+     13. Debug paneli (?debug=1)
+     14. Başlat
    ============================================================================= */
 
 (function () {
@@ -43,7 +42,7 @@
     window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ?debug=1 varsa manuel test paneli açılır (bkz. bölüm 14). Normal
+  // ?debug=1 varsa manuel test paneli açılır (bkz. bölüm 13). Normal
   // ziyaretçide bu param hiç olmayacağı için panel asla görünmez.
   var debugMode = (function () {
     try { return new URLSearchParams(window.location.search).get('debug') === '1'; }
@@ -225,39 +224,6 @@
     media.appendChild(buildPicture(C.gate, { eager: true, priority: 'high' }));
   }
 
-  function renderHeroSlides() {
-    var wrap = $('#hero-slides');
-    if (!wrap || !Array.isArray(C.hero)) return;
-
-    var minSec = OPT.kenBurnsMinSec || 20;
-    var maxSec = OPT.kenBurnsMaxSec || 26;
-
-    C.hero.forEach(function (item, i) {
-      var first = i === 0;
-      var picture = buildPicture(item, {
-        eager: first,
-        priority: first ? 'high' : null
-      });
-
-      var slide = el('figure', {
-        class: 'hero__slide' + (first ? ' is-active' : ''),
-        'aria-hidden': first ? null : 'true'
-      }, [picture]);
-
-      // Ken Burns: her slayta ayrı süre ve yön — çok yavaş (20-26s)
-      var img = picture.tagName === 'IMG' ? picture : $('img', picture);
-      if (img) {
-        img.style.setProperty('--kb-dur', randBetween(minSec, maxSec).toFixed(1) + 's');
-        img.style.setProperty('--kb-x', (i % 2 === 0 ? '' : '-') + randBetween(1, 3).toFixed(1) + '%');
-        img.style.setProperty('--kb-y', (i % 4 < 2 ? '-' : '') + randBetween(1, 2.5).toFixed(1) + '%');
-        // Negatif gecikme: slaytlar aynı karede başlamasın
-        img.style.animationDelay = '-' + (i * 4) + 's';
-      }
-
-      wrap.appendChild(slide);
-    });
-  }
-
   function renderPhoto() {
     var section = $('#photo');
     var media = $('#photo-figure');
@@ -265,7 +231,8 @@
 
     if (!C.photo) { section.remove(); return; }
 
-    media.appendChild(buildPicture(C.photo));
+    // Kapıdan sonra sayfanın ilk görseli — LCP adayı: eager + fetchpriority=high.
+    media.appendChild(buildPicture(C.photo, { eager: true, priority: 'high' }));
   }
 
 
@@ -410,8 +377,8 @@
         if (removed) return;
         removed = true;
         if (gate.parentNode) gate.parentNode.removeChild(gate);
-        var hero = $('#hero-title');
-        if (hero) hero.focus();
+        var photoTitle = $('#photo-title');
+        if (photoTitle) photoTitle.focus();
       }
       gate.addEventListener('transitionend', remove, { once: true });
       // transitionend gelmezse (reduced-motion, arka plan sekme) yedek
@@ -424,7 +391,6 @@
       opened = true;
 
       startMusic();          // kullanıcı jesti burada — autoplay policy tamam
-      startHeroSlideshow();
 
       // Hareket azaltma tercihinde animasyon aşamasını HİÇ oynatmıyoruz;
       // süreler .01ms'e indiği için oynatmak boş bir bekleme olurdu.
@@ -462,72 +428,7 @@
 
 
   /* ==========================================================================
-     06. HERO SLIDESHOW
-     -----------------------------------------------------------------------
-     CSS crossfade; JS sadece .is-active sınıfını taşır.
-     ========================================================================== */
-
-  var slideshow = { timer: null, index: 0, slides: [] };
-
-  function startHeroSlideshow() {
-    if (slideshow.timer) return;
-
-    slideshow.slides = $$('#hero-slides .hero__slide');
-    if (slideshow.slides.length < 2) return;
-
-    var interval = OPT.heroSlideMs || 6000;
-
-    function advance() {
-      var prev = slideshow.slides[slideshow.index];
-      slideshow.index = (slideshow.index + 1) % slideshow.slides.length;
-      var next = slideshow.slides[slideshow.index];
-
-      prev.classList.remove('is-active');
-      prev.setAttribute('aria-hidden', 'true');
-      next.classList.add('is-active');
-      next.removeAttribute('aria-hidden');
-    }
-
-    slideshow.timer = window.setInterval(advance, interval);
-
-    // Sekme arka plandayken boşa çalışmasın
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) {
-        window.clearInterval(slideshow.timer);
-        slideshow.timer = null;
-      } else if (!slideshow.timer) {
-        slideshow.timer = window.setInterval(advance, interval);
-      }
-    });
-  }
-
-  // Aşağı kaydır ipucu: tıklanınca bir sonraki bölüme kaydırır, kullanıcı
-  // zaten kaydırmaya başlayınca (hero ekrandan çıkınca) kendini gizler.
-  function setupHeroScroll() {
-    var hero = $('#hero');
-    var btn = $('#hero-scroll');
-    if (!hero || !btn) return;
-
-    btn.addEventListener('click', function () {
-      var next = hero.nextElementSibling;
-      if (next && next.scrollIntoView) {
-        next.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-      }
-    });
-
-    if (!window.IntersectionObserver) return;
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        btn.classList.toggle('is-hidden', entry.intersectionRatio < 0.6);
-      });
-    }, { threshold: 0.6 });
-    io.observe(hero);
-  }
-
-
-  /* ==========================================================================
-     07. GERİ SAYIM
+     06. GERİ SAYIM
      ========================================================================== */
 
   function setupCountdown() {
@@ -576,7 +477,7 @@
 
 
   /* ==========================================================================
-     08. TAKVİME EKLE
+     07. TAKVİME EKLE
      -----------------------------------------------------------------------
      Google Calendar linki runtime'da CONFIG'den kurulur.
      invite.ics repo kökünde statik durur (README'de senkron notu var).
@@ -612,7 +513,7 @@
 
 
   /* ==========================================================================
-     09. KONUM
+     08. KONUM
      ========================================================================== */
 
   function setupLocation() {
@@ -657,7 +558,7 @@
 
 
   /* ==========================================================================
-     10. RSVP
+     09. RSVP
      -----------------------------------------------------------------------
      Gönderim üç aşamalı fallback zinciri:
        A) fetch + text/plain body + res.json() — birincil yol.
@@ -1044,7 +945,7 @@
 
 
   /* ==========================================================================
-     11. SCROLL REVEAL
+     10. SCROLL REVEAL
      -----------------------------------------------------------------------
      Tek seferlik: göründükten sonra gözlemden çıkarılır.
      ========================================================================== */
@@ -1071,7 +972,7 @@
 
 
   /* ==========================================================================
-     12. PARTİKÜLLER
+     11. PARTİKÜLLER
      -----------------------------------------------------------------------
      Tamamen dekoratif. CONFIG.options.particles = false ile kapanır.
      Toplam element sayısı particleCount'u (varsayılan 12) AŞMAZ.
@@ -1119,7 +1020,7 @@
 
 
   /* ==========================================================================
-     13. PİKSEL DAVETİYE SAHNESİ
+     12. PİKSEL DAVETİYE SAHNESİ
      -----------------------------------------------------------------------
      34 yıldız + 46 konfeti elemanını burada üretiyoruz; 80 <div>'i elle
      yazmamak için. Rastgele değerler SADECE BİR KEZ üretilir: bu fonksiyon
@@ -1199,7 +1100,7 @@
 
 
   /* ==========================================================================
-     14. DEBUG PANELİ (?debug=1)
+     13. DEBUG PANELİ (?debug=1)
      -----------------------------------------------------------------------
      Manuel tarayıcı testi için: URL'de ?debug=1 yoksa bu fonksiyon hiçbir
      şey yapmaz (panel oluşturulmaz, DOM'a tek bir eleman bile eklenmez).
@@ -1330,7 +1231,7 @@
 
 
   /* ==========================================================================
-     15. BAŞLAT
+     14. BAŞLAT
      ========================================================================== */
 
   function renderGreeting() {
@@ -1349,12 +1250,10 @@
     renderGreeting();
 
     renderGate();
-    renderHeroSlides();
     renderPhoto();
 
     setupAudioToggle();
     setupGate();
-    setupHeroScroll();
 
     setupCountdown();
     setupCalendar();
@@ -1365,9 +1264,6 @@
     setupParticles();
     setupPixelScene();
     setupDebugPanel();
-
-    // Kapı ekranı yoksa (ör. elle kaldırıldıysa) slideshow yine başlasın
-    if (!$('#gate')) startHeroSlideshow();
   }
 
   if (document.readyState === 'loading') {

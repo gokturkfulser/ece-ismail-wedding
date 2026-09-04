@@ -125,7 +125,7 @@
          yıldız/konfeti üretimi app.js setupPixelScene() içinde.
 
          Tamamen dekoratif: aria-hidden. İsim ve tarih ekran okuyucuya kapının
-         karşılama aşamasında ve hero'da zaten okunuyor, tekrarlamıyoruz.
+         karşılama aşamasında ve fotoğraf bölümünde zaten okunuyor, tekrarlamıyoruz.
 
          Animasyon .is-running eklenince başlar — kapı butonuna basıldığı an.
          Zaman çizelgesi (sn): 0.6 giriş · 4.0 buluşma · 4.2 kalp · 4.4 konfeti
@@ -197,50 +197,20 @@
     </svg>
   </button>
 
-  <!-- ==========================================================================
-       1. HERO — slideshow + Ken Burns
-       ========================================================================== -->
-  <header class="hero fullscreen" id="hero">
-    <div class="hero__slides scrim" id="hero-slides"><!-- CONFIG.hero → app.js --></div>
-
-    <!-- Dekoratif partikül katmanı (CONFIG.options.particles = false ile kapanır) -->
-    <div class="particles" data-particles aria-hidden="true"></div>
-
-    <div class="hero__content">
-      <h2 class="hero__names" id="hero-title" tabindex="-1">
-        <span data-text="bride"></span>
-        <span class="hero__sep" aria-hidden="true" data-text="coupleSeparator"></span>
-        <span data-text="groom"></span>
-      </h2>
-
-      <p class="hero__meta">
-        <span data-text="dateLabel"></span>
-        <span data-text="timeLabel"></span>
-        <span class="hero__venue" data-text="venueName"></span>
-      </p>
-    </div>
-
-    <!-- Aşağıda form/detay olduğunu göstermek için — özellikle mobilde sayfa
-         hero'dan sonra boş görünmesin diye. Tıklanınca bir sonraki bölüme
-         kaydırır; prefers-reduced-motion açıkken zıplama durur ama ok kalır. -->
-    <button class="hero__scroll" type="button" id="hero-scroll" aria-label="Aşağı kaydır">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M6 9l6 6 6-6"></path>
-      </svg>
-    </button>
-  </header>
-
   <main>
 
     <!-- ========================================================================
-         2. FOTOĞRAF — hero'nun altında tek görsel banner (CONFIG.photo),
-            isimler fotoğrafın üstüne ortalı biniyor
+         1. FOTOĞRAF — kapıdan sonra sayfanın en üstündeki tam genişlik banner
+            (CONFIG.photo), isimler fotoğrafın üstüne ortalı biniyor
          ======================================================================== -->
     <section class="photo" id="photo">
       <div class="photo__media scrim" id="photo-figure"><!-- CONFIG.photo → app.js --></div>
+
+      <!-- Dekoratif partikül katmanı (CONFIG.options.particles = false ile kapanır) -->
+      <div class="particles" data-particles aria-hidden="true"></div>
+
       <div class="photo__content" data-reveal>
-        <h2 class="photo__names">
+        <h2 class="photo__names" id="photo-title" tabindex="-1">
           <span data-text="bride"></span>
           <span class="photo__sep" aria-hidden="true" data-text="coupleSeparator"></span>
           <span data-text="groom"></span>
@@ -249,7 +219,7 @@
     </section>
 
     <!-- ========================================================================
-         3. DAVETİYE METNİ
+         2. DAVETİYE METNİ
          ======================================================================== -->
     <section class="section" id="invite" aria-labelledby="invite-title">
       <div class="section__inner">
@@ -264,7 +234,7 @@
     </section>
 
     <!-- ========================================================================
-         4. ETKİNLİK DETAYI
+         3. ETKİNLİK DETAYI
          ======================================================================== -->
     <section class="section section--alt" id="details" aria-labelledby="details-title">
       <div class="section__inner">
@@ -303,7 +273,7 @@
     </section>
 
     <!-- ========================================================================
-         5. GERİ SAYIM
+         4. GERİ SAYIM
          ======================================================================== -->
     <section class="section section--dark" id="countdown-section" aria-labelledby="countdown-title">
       <div class="particles" data-particles aria-hidden="true"></div>
@@ -337,7 +307,7 @@
     </section>
 
     <!-- ========================================================================
-         6. RSVP
+         5. RSVP
          ======================================================================== -->
     <section class="section section--alt" id="rsvp" aria-labelledby="rsvp-title">
       <div class="section__inner">
@@ -436,7 +406,7 @@
     </section>
 
     <!-- ========================================================================
-         7. KONUM
+         6. KONUM
          ======================================================================== -->
     <section class="section" id="location" aria-labelledby="location-title">
       <div class="section__inner section__inner--wide">
@@ -468,7 +438,7 @@
   </main>
 
   <!-- ==========================================================================
-       8. FOOTER
+       7. FOOTER
        ========================================================================== -->
   <footer class="footer">
     <p class="footer__names">

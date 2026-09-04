@@ -74,7 +74,7 @@ CONFIG'e bağlı.
 
 | Alan | Ne yapar | Not |
 |---|---|---|
-| `bride`, `groom`, `coupleSeparator` | İsimler (kapı, hero, footer) | |
+| `bride`, `groom`, `coupleSeparator` | İsimler (kapı, üst fotoğraf, footer) | |
 | `dateISO` | **Kaynak tarih.** Geri sayım + takvim linki bunu kullanır | ISO 8601, saat dilimi offset'i şart: `+03:00` |
 | `endISO` | Takvim kaydının bitişi | Google Calendar ve .ics için gerekli |
 | `dateLabel`, `timeLabel` | **Ekranda görünen** tarih/saat metni | Bilinçli olarak elle yazılıyor — WhatsApp içi eski WebView'larda `toLocaleDateString('tr-TR')` tutarsız çalışıyor. `dateISO`'yu değiştirince bunu da değiştir. |
@@ -87,13 +87,10 @@ CONFIG'e bağlı.
 | `text.*` | Bütün görünen metinler | Değiştirmek serbest; anahtar adını değiştirmezsen HTML'e dokunmana gerek yok |
 | `text.inviteBody` | **Dizi** — her eleman bir `<p>` olur | İstediğin kadar paragraf ekle |
 | `gate` | Kapı ekranı arka plan görseli | `portrait` = mobil, `landscape` = masaüstü |
-| `hero[]` | Slideshow görselleri (3-4 tane ideal) | Her biri `portrait` + `landscape` + `width`/`height` |
-| `photo` | Hero'nun altında, sayfanın üst bölgesindeki tek görsel | `portrait` = mobil, `landscape` = masaüstü. Boş bırakırsan bölüm tamamen kalkar |
+| `photo` | Kapıdan sonra sayfanın en üstündeki tek görsel banner | `portrait` = mobil, `landscape` = masaüstü. Boş bırakırsan bölüm tamamen kalkar |
 | `audio.src` | Müzik dosyası yolu | Boş bırakırsan müzik özelliği tamamen devre dışı |
 | `audio.targetVolume` | 0–1 arası hedef ses seviyesi | Fade-in 0'dan buraya çıkar |
 | `audio.fadeInMs` | Fade-in süresi (ms) | |
-| `options.heroSlideMs` | Slayt başına görünme süresi | |
-| `options.kenBurnsMinSec/MaxSec` | Ken Burns zoom süresi aralığı | Çok yavaş olsun: 20–26 sn |
 | `options.particles` | Dekoratif partikül katmanı | `false` = tamamen kapalı, element bile oluşmaz |
 | `options.particleCount` | En fazla 12 | Sayfadaki tüm katmanlara bölünür |
 
@@ -296,8 +293,6 @@ görselle gelmiyor. Kendi fotoğraflarını **aynı dosya adlarıyla** üzerine 
 |---|---|---|
 | `gate-portrait.webp` | 1080×1920 | Kapı ekranı, mobil |
 | `gate-landscape.webp` | 1920×1080 | Kapı ekranı, masaüstü |
-| `hero-1..4-portrait.webp` | 1080×1620 | Slideshow, mobil |
-| `hero-1..4-landscape.webp` | 1600×900 | Slideshow, masaüstü |
 | `photo-portrait.webp` | 1080×1350 | Üst bölge fotoğrafı, mobil |
 | `photo-landscape.webp` | 1600×1067 | Üst bölge fotoğrafı, masaüstü |
 | `og.png` | 1200×630 | Sosyal medya kartı (WebP değil — scraper uyumu) |
@@ -308,14 +303,6 @@ görselle gelmiyor. Kendi fotoğraflarını **aynı dosya adlarıyla** üzerine 
 ### ffmpeg ile (tek araç, her şeyi yapar)
 
 ```bash
-# --- Hero: yatay kırpım (masaüstü) 1600x900 ---
-ffmpeg -i foto.jpg -vf "scale=1600:900:force_original_aspect_ratio=increase,crop=1600:900" \
-  -c:v libwebp -q:v 80 hero-1-landscape.webp
-
-# --- Hero: dikey kırpım (mobil) 1080x1620 ---
-ffmpeg -i foto.jpg -vf "scale=1080:1620:force_original_aspect_ratio=increase,crop=1080:1620" \
-  -c:v libwebp -q:v 80 hero-1-portrait.webp
-
 # --- Kapı ekranı ---
 ffmpeg -i kapak.jpg -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" \
   -c:v libwebp -q:v 82 gate-portrait.webp
@@ -360,13 +347,13 @@ Kullanım — kırpma/ölçekleme cwebp'in kendi bayraklarıyla:
 
 ```bash
 # Ölçekle + kalite 80 (yükseklik 0 = oranı koru)
-cwebp -q 80 -resize 1600 0 foto.jpg -o hero-1-landscape.webp
+cwebp -q 80 -resize 1600 0 foto.jpg -o photo-landscape.webp
 
 # Kırp: -crop x_offset y_offset genişlik yükseklik  (ölçeklemeden ÖNCE uygulanır)
-cwebp -q 80 -crop 0 300 3000 1687 -resize 1600 900 foto.jpg -o hero-1-landscape.webp
+cwebp -q 80 -crop 0 300 3000 1687 -resize 1600 1067 foto.jpg -o photo-landscape.webp
 
 # Metin/keskin kenar içeren görsellerde daha iyi sonuç
-cwebp -q 82 -m 6 -sharp_yuv -resize 1080 1620 foto.jpg -o hero-1-portrait.webp
+cwebp -q 82 -m 6 -sharp_yuv -resize 1080 1350 foto.jpg -o photo-portrait.webp
 ```
 
 Toplu dönüştürme:
@@ -384,7 +371,6 @@ done
 Trafiğin %95'i WhatsApp içi tarayıcıdan gelen telefon. Hedef:
 
 - Kapı ekranı görseli: **< 200 KB** (LCP elemanı, en kritik dosya)
-- Hero slaytları: **< 150 KB** / adet
 - Üst bölge fotoğrafı: **< 150 KB** / adet
 
 Kontrol: `ls -lhS assets/img/`
@@ -482,7 +468,6 @@ ve WhatsApp içi WebView masaüstü tarayıcıdan farklı davranıyor.
 
 - [ ] Kapı ekranı: butona basınca fade-out oluyor, müzik yumuşak giriyor
 - [ ] Mute butonu çalışıyor, sayfa yenilenince durum korunuyor
-- [ ] Hero slideshow geçiyor, Ken Burns fark edilir ama rahatsız etmiyor
 - [ ] Geri sayım doğru, saniyeler iki haneli
 - [ ] `?d=Test%20Kullanıcı&k=3` → selamlama ve ön-dolu alanlar
 - [ ] RSVP gönderimi Sheets'e düşüyor, mail geliyor
@@ -506,7 +491,7 @@ edilemeyince `window.CONFIG` tanımsız kalıyor.
 **Görseller kırık**
 Yolda baştaki `/` var mı? `assets/...` doğru, `/assets/...` proje reposunda
 kırılır. Bir de dosya adı büyük/küçük harf duyarlı — Pages'te Linux çalışıyor,
-Windows'ta çalışan `Hero-1.webp` orada bulunamaz.
+Windows'ta çalışan `Photo-1.webp` orada bulunamaz.
 
 **RSVP gönderilmiyor — konsolda CORS hatası**
 1. `Who has access` **Anyone** mı? (`Anyone with Google account` olmaz)
@@ -545,12 +530,10 @@ farklı cihazlarda farklı yorumlanıyor. `+03:00` şart.
 - Animasyonlar **yalnızca** `transform` ve `opacity` üzerinde
   (`width`/`top`/`left`/`filter`/`box-shadow` animasyonu yok — kompozitör
   dışına çıkmıyor, mobilde jank yapmıyor).
-- `@media (prefers-reduced-motion: reduce)` içinde Ken Burns, partiküller ve
+- `@media (prefers-reduced-motion: reduce)` içinde partiküller ve
   scroll reveal kapalı.
 - Scroll reveal `IntersectionObserver` ile, tek seferlik — eleman göründükten
   sonra `unobserve` ediliyor.
-- Tam ekran bölümler `100dvh` kullanıyor, `100vh` fallback'i önce yazılı
-  (mobil adres çubuğu zıplaması).
 - `localStorage` erişimi `try/catch` içinde — gizli sekmede ve kısıtlı
   WebView'larda exception atabiliyor.
 - RSVP isteğinde 15 saniyelik `AbortController` timeout'u var; takılı kalan

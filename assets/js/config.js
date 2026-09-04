@@ -155,34 +155,7 @@ window.CONFIG = {
     alt: "Aybala Ece ve İsmail"
   },
 
-  hero: [
-    {
-      portrait: "assets/img/hero-1-portrait.webp",
-      landscape: "assets/img/hero-1-landscape.webp",
-      width: 1600, height: 900,
-      alt: "Aybala Ece ve İsmail el ele"
-    },
-    {
-      portrait: "assets/img/hero-2-portrait.webp",
-      landscape: "assets/img/hero-2-landscape.webp",
-      width: 1600, height: 900,
-      alt: "Aybala Ece ve İsmail gün batımında"
-    },
-    {
-      portrait: "assets/img/hero-3-portrait.webp",
-      landscape: "assets/img/hero-3-landscape.webp",
-      width: 1600, height: 900,
-      alt: "Aybala Ece ve İsmail gülerken"
-    },
-    {
-      portrait: "assets/img/hero-4-portrait.webp",
-      landscape: "assets/img/hero-4-landscape.webp",
-      width: 1600, height: 900,
-      alt: "Aybala Ece ve İsmail birlikte"
-    }
-  ],
-
-  // Hero'nun hemen altında, sayfanın üst bölgesinde görünen tek fotoğraf.
+  // Kapıdan sonra sayfanın en üstünde görünen tek fotoğraf (isimler üstüne biner).
   photo: {
     portrait: "assets/img/photo-portrait.webp",
     landscape: "assets/img/photo-landscape.webp",
@@ -201,9 +174,6 @@ window.CONFIG = {
 
   /* ----------------------------------------------------------------- Ayarlar */
   options: {
-    heroSlideMs: 6000,      // slayt başına görünme süresi
-    kenBurnsMinSec: 20,     // Ken Burns zoom süresi alt sınır
-    kenBurnsMaxSec: 26,     // Ken Burns zoom süresi üst sınır
     particles: true,        // dekoratif partikül katmanı (false = tamamen kapalı)
     particleCount: 12       // en fazla 12
   }
